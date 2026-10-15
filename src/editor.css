@@ -1,0 +1,94 @@
+/*
+ * @cms/editor — CSS độc lập (không cần Tailwind). Đổi màu bằng biến trên .cms-editor (hoặc thẻ cha):
+ *   --cms-ed-bg, --cms-ed-panel, --cms-ed-fg, --cms-ed-muted, --cms-ed-faint, --cms-ed-line, --cms-ed-hover,
+ *   --cms-ed-accent, --cms-ed-accent-soft, --cms-ed-accent-fg, --cms-ed-danger, --cms-ed-code-bg, --cms-ed-font
+ */
+:where(.cms-editor, .cms-ed-slash, .cms-ed-bubble) {
+  /* :where → độ ưu tiên 0: ứng dụng nhúng ghi đè được dù CSS này nạp sau */
+  --cms-ed-panel: #fff; --cms-ed-fg: #18181b; --cms-ed-muted: #71717a; --cms-ed-faint: #a1a1aa; --cms-ed-line: #e4e4e7;
+  --cms-ed-hover: #f4f4f5; --cms-ed-accent: #4f46e5; --cms-ed-accent-soft: #eef2ff; --cms-ed-accent-fg: #fff; --cms-ed-danger: #dc2626;
+  --cms-ed-code-bg: #18181b; --cms-ed-font: inherit;
+}
+.cms-editor { color: var(--cms-ed-fg); font-family: var(--cms-ed-font); }
+
+/* Thanh công cụ */
+.cms-ed-toolbar { border-bottom: 1px solid var(--cms-ed-line); background: var(--cms-ed-panel); padding: 6px 0; }
+.cms-ed-toolbar-row { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; }
+.cms-ed-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 0; border-radius: 6px;
+  background: transparent; color: var(--cms-ed-muted); cursor: pointer; transition: background .12s, color .12s; }
+.cms-ed-btn:hover { background: var(--cms-ed-hover); color: var(--cms-ed-fg); }
+.cms-ed-btn.is-active { background: var(--cms-ed-accent-soft); color: var(--cms-ed-accent); }
+.cms-ed-btn:disabled { opacity: .3; cursor: default; }
+.cms-ed-sep { display: inline-block; width: 1px; height: 16px; margin: 0 2px; background: var(--cms-ed-line); }
+.cms-ed-hint { margin-left: auto; font-size: 11px; color: var(--cms-ed-faint); }
+@media (max-width: 768px) { .cms-ed-hint { display: none; } }
+.cms-ed-table-tools { display: inline-flex; gap: 2px; margin-left: 4px; padding: 0 4px; border-radius: 6px; background: var(--cms-ed-hover); font-size: 12px; }
+.cms-ed-table-tools button, .cms-ed-text-btn { border: 0; background: transparent; color: var(--cms-ed-muted); padding: 3px 7px; border-radius: 5px; font: inherit; font-size: 12px; cursor: pointer; }
+.cms-ed-table-tools button:hover, .cms-ed-text-btn:hover { background: var(--cms-ed-hover); color: var(--cms-ed-fg); }
+.cms-ed-table-tools .is-danger { color: var(--cms-ed-danger); }
+.cms-ed-select { height: 28px; border: 1px solid var(--cms-ed-line); border-radius: 6px; background: var(--cms-ed-panel); color: var(--cms-ed-fg); font: inherit; font-size: 12px; padding: 0 4px; }
+
+/* Menu nổi + slash menu */
+.cms-ed-bubble { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; padding: 4px; border: 1px solid var(--cms-ed-line); border-radius: 10px;
+  background: var(--cms-ed-panel); color: var(--cms-ed-fg); box-shadow: 0 10px 30px rgb(0 0 0 / .14); }
+.cms-ed-slash { position: fixed; z-index: 1000; width: 260px; max-height: 300px; overflow-y: auto; padding: 4px; border: 1px solid var(--cms-ed-line);
+  border-radius: 10px; background: var(--cms-ed-panel); color: var(--cms-ed-fg); box-shadow: 0 16px 40px rgb(0 0 0 / .18); }
+.cms-ed-slash-item { display: flex; width: 100%; align-items: center; gap: 10px; padding: 6px 8px; border: 0; border-radius: 7px; background: transparent; color: inherit; text-align: left; cursor: pointer; font: inherit; }
+.cms-ed-slash-item.is-active { background: var(--cms-ed-hover); }
+.cms-ed-slash-icon { display: inline-flex; width: 28px; height: 28px; align-items: center; justify-content: center; border: 1px solid var(--cms-ed-line); border-radius: 7px; color: var(--cms-ed-muted); flex-shrink: 0; }
+.cms-ed-slash-title { display: block; font-size: 13px; }
+.cms-ed-slash-hint { display: block; font-size: 11px; color: var(--cms-ed-faint); }
+.cms-ed-slash-empty { padding: 12px 8px; text-align: center; font-size: 12px; color: var(--cms-ed-muted); }
+
+/* Nội dung */
+.cms-ed-content { min-height: 50vh; padding: 16px 0 96px; outline: none; font-size: 15px; line-height: 1.75; }
+.cms-ed-content > * + * { margin-top: .85em; }
+.cms-ed-content h2 { margin-top: 2rem; font-size: 1.5rem; font-weight: 600; letter-spacing: -.01em; }
+.cms-ed-content h3 { margin-top: 1.5rem; font-size: 1.25rem; font-weight: 600; }
+.cms-ed-content h4 { margin-top: 1.25rem; font-size: 1.125rem; font-weight: 600; }
+.cms-ed-content ul { list-style: disc; padding-left: 1.5rem; }
+.cms-ed-content ol { list-style: decimal; padding-left: 1.5rem; }
+.cms-ed-content li > p { margin: 0; }
+.cms-ed-content blockquote { border-left: 3px solid var(--cms-ed-accent); padding-left: 1rem; color: var(--cms-ed-muted); }
+.cms-ed-content pre { border-radius: 8px; background: var(--cms-ed-code-bg); color: #f4f4f5; padding: 1rem; font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; overflow-x: auto; }
+.cms-ed-content pre code { background: none; padding: 0; }
+.cms-ed-content code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
+.cms-ed-content a { color: var(--cms-ed-accent); text-decoration: underline; text-underline-offset: 2px; }
+.cms-ed-content hr { margin: 2rem 0; border: 0; border-top: 1px solid var(--cms-ed-line); }
+.cms-ed-content table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.cms-ed-content td, .cms-ed-content th { border: 1px solid var(--cms-ed-line); padding: 6px 10px; vertical-align: top; }
+.cms-ed-content th { background: var(--cms-ed-hover); font-weight: 600; }
+.cms-ed-content .selectedCell { background: var(--cms-ed-accent-soft); }
+.cms-ed-content p.is-empty::before, .cms-ed-content h2.is-empty::before, .cms-ed-content h3.is-empty::before, .cms-ed-content h4.is-empty::before {
+  content: attr(data-placeholder); float: left; height: 0; pointer-events: none; color: var(--cms-ed-faint); }
+.cms-ed-content div[data-youtube-video] iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 8px; }
+
+/* Ảnh: kéo góc để đổi kích thước */
+.cms-ed-content img { max-width: 100%; height: auto; border-radius: 8px; }
+.cms-ed-content [data-resize-container] { position: relative; display: inline-block; max-width: 100%; }
+.cms-ed-content [data-resize-wrapper] { display: block; max-width: 100%; }
+.cms-ed-content [data-resize-handle] { position: absolute; z-index: 2; width: 12px; height: 12px; border: 2px solid var(--cms-ed-accent); border-radius: 3px;
+  background: var(--cms-ed-panel); opacity: 0; transition: opacity .12s; }
+.cms-ed-content [data-resize-container]:hover [data-resize-handle], .cms-ed-content .ProseMirror-selectednode [data-resize-handle],
+.cms-ed-content [data-resize-state="true"] [data-resize-handle] { opacity: 1; }
+.cms-ed-content [data-resize-handle="top-left"] { top: -6px; left: -6px; cursor: nwse-resize; }
+.cms-ed-content [data-resize-handle="top-right"] { top: -6px; right: -6px; cursor: nesw-resize; }
+.cms-ed-content [data-resize-handle="bottom-left"] { bottom: -6px; left: -6px; cursor: nesw-resize; }
+.cms-ed-content [data-resize-handle="bottom-right"] { bottom: -6px; right: -6px; cursor: nwse-resize; }
+.cms-ed-content .ProseMirror-selectednode img, .cms-ed-content img.ProseMirror-selectednode { outline: 2px solid var(--cms-ed-accent); outline-offset: 2px; }
+.cms-ed-content [data-node="image"] { margin: .5em 0; }
+
+/* Khối media (gallery, video, âm thanh, tệp) */
+.cms-ed-block { margin: 1rem 0; padding: 8px; border: 1px solid var(--cms-ed-line); border-radius: 10px; background: var(--cms-ed-hover); }
+.cms-ed-block.is-selected { border-color: var(--cms-ed-accent); box-shadow: 0 0 0 3px var(--cms-ed-accent-soft); }
+.cms-ed-block-label { margin-bottom: 6px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--cms-ed-faint); }
+.cms-ed-gallery { display: grid; gap: 6px; }
+.cms-ed-gallery img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 5px; }
+.cms-ed-gallery-cols { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 12px; color: var(--cms-ed-muted); }
+.cms-ed-gallery-cols button { border: 0; padding: 2px 8px; border-radius: 5px; background: transparent; color: inherit; cursor: pointer; font: inherit; }
+.cms-ed-gallery-cols button:hover { background: var(--cms-ed-panel); }
+.cms-ed-gallery-cols button.is-active { background: var(--cms-ed-accent); color: var(--cms-ed-accent-fg); }
+.cms-ed-video { width: 100%; max-height: 320px; border-radius: 6px; }
+.cms-ed-audio { width: 100%; }
+.cms-ed-file { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.cms-ed-media-name { display: flex; align-items: center; gap: 4px; margin-top: 4px; font-size: 12px; color: var(--cms-ed-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
