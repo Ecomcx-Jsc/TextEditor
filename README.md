@@ -10,6 +10,12 @@ Trình soạn thảo nội dung dạng khối dựa trên [TipTap](https://tipta
 - Plugin thêm khối: `registerEditorExtension`
 - Lưu dạng JSON (khối) — hiển thị ra HTML bằng renderer của theme hoặc `generateHTML` của TipTap
 
+## TipTap đi kèm (vendored)
+
+Trình soạn mang sẵn đúng bản TipTap + ProseMirror đã kiểm thử (`node_modules` của các gói đó được commit, khai báo `bundleDependencies`): cài `@cms/editor` từ GitHub không tải TipTap từ npm — TipTap có ngừng phát triển hay đổi gói thì mọi CMS vẫn cài và build được. Không phần nào khác import TipTap: plugin dùng `defineBlock` / `registerBlock`; lớp cấp thấp (`Node`, `Mark`, `Extension`, `mergeAttributes`) xuất lại từ `@cms/editor`.
+
+Nâng TipTap: đổi phiên bản trong `package.json` → `npm install` → `node scripts/vendor.mjs` → `npm test` (hợp đồng nội dung phải qua) → commit cả `node_modules/` đã vendor.
+
 ## Dùng
 
 ```tsx

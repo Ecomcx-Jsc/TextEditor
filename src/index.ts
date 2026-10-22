@@ -7,3 +7,5 @@ export { registerEditorExtension, unregisterEditorExtension, registeredExtension
 export type { ContentDoc, EditorExtensionPack, InsertItem, MediaItem, MediaKind, MediaProvider, MediaSize } from "./types";
 export { registerBlock, unregisterBlock, registeredBlocks, blockNode, type BlockEditProps, type RegisterBlockOptions } from "./blocks";
 export { defineBlock, type BlockDefinition } from "@cms/content";
+/** Lớp TipTap cấp thấp (Node, Mark, Extension…) — cho ứng dụng nhúng cần viết extension riêng; plugin nên dùng defineBlock/registerBlock. */
+export { Node, Mark, Extension, mergeAttributes, getSchema } from "@tiptap/core";
