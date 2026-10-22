@@ -1,10 +1,6 @@
 import { Extension, type Editor as TiptapEditor, type Range } from "@tiptap/core";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react/menus";
-import StarterKit from "@tiptap/starter-kit";
-import TextAlign from "@tiptap/extension-text-align";
-import Youtube from "@tiptap/extension-youtube";
-import { TableKit } from "@tiptap/extension-table";
 import { Placeholder } from "@tiptap/extensions";
 import Suggestion, { type SuggestionProps } from "@tiptap/suggestion";
 import {
@@ -15,7 +11,8 @@ import { useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from
 import { createPortal } from "react-dom";
 import { viLabels, type EditorLabels } from "./labels";
 import { galleryImage, imageAttrs } from "./media";
-import { AudioNode, CmsImage, EditorContext, FileNode, Gallery, VideoNode } from "./nodes";
+import { coreExtensions, knownTypes } from "./extensions";
+import { unwrapUnknown, wrapUnknown } from "./unknown";
 import { onExtensionsChange, registeredExtensions } from "./registry";
 import type { EditorExtensionPack, InsertItem, MediaItem, MediaKind, MediaProvider } from "./types";
 import { cx, norm } from "./util";
@@ -315,18 +312,14 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
 
   const editor = useEditor({
     extensions: [
-      // Link: không tự gắn rel="nofollow"/tab mới cho mọi liên kết (mặc định của TipTap) — website/plugin SEO quyết định theo tên miền
-      StarterKit.configure({ heading: { levels: [2, 3, 4] }, link: { openOnClick: false, autolink: true, HTMLAttributes: { target: null, rel: null } } }),
-      CmsImage, Gallery, VideoNode, AudioNode, FileNode, EditorContext,
-      TextAlign.configure({ types: ["heading", "paragraph"] }),
-      Youtube.configure({ nocookie: true }),
-      TableKit.configure({ table: { resizable: false } }),
+      ...coreExtensions(),
       Placeholder.configure({ placeholder: ({ node }) => (node.type.name === "heading" ? t.headingPlaceholder : t.placeholder), showOnlyCurrent: true }),
       slashExtension(slash, () => itemsRef.current),
       ...packs.flatMap((p) => p.extensions ?? []),
     ],
-    content: initial || "",
-    onUpdate: ({ editor: e }) => onChange(e.getJSON()),
+    // Khối / định dạng lạ (plugin đã tắt) được bọc giữ nguyên thay vì làm trình soạn báo lỗi
+    content: initial && typeof initial === "object" ? wrapUnknown(initial, knownTypes(packs.flatMap((p) => p.extensions ?? []))) : initial || "",
+    onUpdate: ({ editor: e }) => onChange(unwrapUnknown(e.getJSON() as any)),
     editorProps: {
       attributes: { class: "cms-ed-content" },
       handleKeyDown: (_view, event) => {

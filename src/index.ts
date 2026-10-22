@@ -5,3 +5,5 @@ export { imageAttrs, galleryImage } from "./media";
 export { CmsImage, Gallery, VideoNode, AudioNode, FileNode } from "./nodes";
 export { registerEditorExtension, unregisterEditorExtension, registeredExtensions } from "./registry";
 export type { ContentDoc, EditorExtensionPack, InsertItem, MediaItem, MediaKind, MediaProvider, MediaSize } from "./types";
+export { registerBlock, unregisterBlock, registeredBlocks, blockNode, type BlockEditProps, type RegisterBlockOptions } from "./blocks";
+export { defineBlock, type BlockDefinition } from "@cms/content";

@@ -1,6 +1,7 @@
 /** Chữ giao diện của trình soạn. Truyền labels={enLabels} hoặc ghi đè từng chữ. */
 export const viLabels = {
   placeholder: "Gõ “/” để chèn ảnh, bảng, tiêu đề… hoặc bắt đầu viết",
+  unknownBlock: "Khối không xác định", unknownBlockHint: "— plugin tạo khối này chưa bật; dữ liệu được giữ nguyên",
   headingPlaceholder: "Tiêu đề",
   undo: "Hoàn tác (⌘Z)", redo: "Làm lại (⌘⇧Z)",
   paragraph: "Đoạn văn", paragraphHint: "Văn bản thường",
@@ -28,6 +29,7 @@ export type EditorLabels = typeof viLabels;
 
 export const enLabels: EditorLabels = {
   placeholder: "Type “/” to insert images, tables, headings… or start writing",
+  unknownBlock: "Unknown block", unknownBlockHint: "— the plugin that made this block is not active; its data is kept",
   headingPlaceholder: "Heading",
   undo: "Undo (⌘Z)", redo: "Redo (⌘⇧Z)",
   paragraph: "Paragraph", paragraphHint: "Plain text",

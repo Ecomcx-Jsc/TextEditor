@@ -1,0 +1,82 @@
+import assert from "node:assert/strict";
+import { readdirSync, readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import path from "node:path";
+import { test } from "node:test";
+import { getSchema } from "@tiptap/core";
+import { defineBlock, normalizeContent } from "@cms/content";
+import { coreExtensions, knownTypes } from "../src/extensions";
+import { unwrapUnknown, wrapUnknown } from "../src/unknown";
+import { contentToEditor, editorToContent } from "../src/content";
+import { blockNode, registerBlock, registeredBlocks, unregisterBlock } from "../src/blocks";
+import { registeredExtensions } from "../src/registry";
+
+// Hợp đồng phía trình soạn: mở mỗi bài mẫu của @cms/content trong trình soạn rồi lưu lại → nội dung giữ nguyên
+// (sai khác duy nhất được chấp nhận: trình soạn ghi thêm thuộc tính bằng đúng giá trị mặc định — cùng ý nghĩa).
+const fixturesDir = path.join(path.dirname(createRequire(import.meta.url).resolve("@cms/content/package.json")), "fixtures");
+const fixtures = readdirSync(fixturesDir).filter((f) => f.endsWith(".json")).map((f) => JSON.parse(readFileSync(path.join(fixturesDir, f), "utf8")));
+
+function roundTrip(content: unknown) {
+  const extra = registeredExtensions().flatMap((p) => p.extensions ?? []);
+  const schema = getSchema([...coreExtensions(), ...extra]);
+  const { main, others } = contentToEditor(content as any);
+  const doc = schema.nodeFromJSON(wrapUnknown(main, knownTypes(extra)));
+  doc.check(); // nội dung hợp lệ với schema của trình soạn (không chỉ "đọc được")
+  return { saved: editorToContent(unwrapUnknown(doc.toJSON()), others), schema };
+}
+
+/** So ý nghĩa, không so cách ghi: bỏ thuộc tính bằng giá trị mặc định của schema trình soạn (vd ảnh size "large"), bỏ qua thứ tự định dạng. */
+function stripDefaults(node: any, schema: ReturnType<typeof getSchema>): any {
+  if (Array.isArray(node)) return node.map((n) => stripDefaults(n, schema));
+  if (!node || typeof node !== "object") return node;
+  const out: any = {};
+  for (const [k, v] of Object.entries(node)) out[k] = k === "attrs" ? v : stripDefaults(v, schema);
+  // Thứ tự định dạng trên cùng đoạn chữ không mang ý nghĩa (ProseMirror xếp theo thứ hạng trong schema)
+  if (Array.isArray(out.marks)) out.marks = [...out.marks].sort((a: any, b: any) => a.type.localeCompare(b.type));
+  const type = schema.nodes[node.type] ?? schema.marks[node.type];
+  if (type && node.attrs) {
+    const attrs: any = {};
+    for (const [k, v] of Object.entries(node.attrs)) if (JSON.stringify(v) !== JSON.stringify((type.spec.attrs as any)?.[k]?.default ?? null)) attrs[k] = v;
+    if (Object.keys(attrs).length) out.attrs = attrs; else delete out.attrs;
+  }
+  return out;
+}
+
+for (const f of fixtures) {
+  // Khối "html" (nội dung nhập từ hệ thống cũ) được trình soạn chuyển thành rich text — không phải vòng khép kín
+  if (JSON.stringify(f.expected).includes('"type":"html"')) continue;
+  // Bài rỗng: trình soạn luôn có một tài liệu (rỗng) — cùng ý nghĩa
+  if (!f.expected.blocks.length) continue;
+  test(`trình soạn mở rồi lưu lại: ${f.name}`, () => {
+    const { saved, schema } = roundTrip(f.input);
+    assert.deepEqual(stripDefaults(saved, schema), stripDefaults(normalizeContent(f.expected).doc, schema));
+  });
+}
+
+test("khối của plugin chưa bật: hiện 'không xác định', lưu lại không mất dữ liệu", () => {
+  const content = { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "a" }, { type: "other/emoji", attrs: { code: "x" } }, { type: "text", text: "b", marks: [{ type: "other/glow", attrs: { c: 1 } }] }] }, { type: "other/hero", attrs: { title: "T", n: 2 }, content: [{ type: "paragraph" }] }] };
+  const { saved } = roundTrip(content);
+  assert.deepEqual(saved, normalizeContent(content).doc);
+});
+
+const callout = defineBlock({ name: "demo/callout", title: "Hộp lưu ý", content: "blocks", attributes: { tone: { type: "string", enum: ["info", "warning"], default: "info" } } });
+const badge = defineBlock({ name: "demo/badge", title: "Nhãn", version: 2, attributes: { tone: { type: "string" } }, migrate: { 1: ({ color, ...r }) => ({ ...r, tone: color }) } });
+
+test("khối defineBlock: node sinh tự động, lưu đúng thuộc tính, nâng phiên bản khi mở bài cũ", () => {
+  registerBlock(callout); registerBlock(badge);
+  try {
+    assert.equal(registeredBlocks().length, 2);
+    const content = { type: "doc", content: [
+      { type: "demo/callout", attrs: { tone: "warning" }, content: [{ type: "paragraph", content: [{ type: "text", text: "Chú ý" }] }] },
+      { type: "demo/badge", attrs: { color: "red" } }] };
+    const { saved } = roundTrip(content);
+    assert.deepEqual(saved.blocks[0].data.content, [
+      { type: "demo/callout", attrs: { tone: "warning" }, content: [{ type: "paragraph", content: [{ type: "text", text: "Chú ý" }] }] },
+      { type: "demo/badge", attrs: { tone: "red", _v: 2 } }]);
+  } finally { unregisterBlock(callout.name); unregisterBlock(badge.name); }
+});
+
+test("blockNode: content none → atom, blocks → chứa khối", () => {
+  assert.equal(blockNode(badge).config.atom, true);
+  assert.equal(blockNode(callout).config.content, "block+");
+});

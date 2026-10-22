@@ -1,6 +1,6 @@
 {
   "name": "@cms/editor",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Trình soạn thảo nội dung dạng khối (TipTap) của CMS — dùng độc lập trong mọi dự án React: ảnh responsive kéo đổi kích thước, gallery, video, bảng, slash menu, mở rộng bằng plugin.",
   "license": "MIT",
   "type": "module",
@@ -10,17 +10,28 @@
     ".": "./src/index.ts",
     "./style.css": "./src/editor.css"
   },
-  "files": ["src", "README.md"],
-  "sideEffects": ["*.css"],
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18"
   },
   "dependencies": {
+    "@cms/content": "github:Ecomcx-Jsc/ecomcx-nexus-content#semver:^1.1",
     "@tiptap/core": "3.32.0",
+    "@tiptap/extension-highlight": "3.32.0",
     "@tiptap/extension-image": "3.32.0",
+    "@tiptap/extension-list": "3.32.0",
+    "@tiptap/extension-subscript": "3.32.0",
+    "@tiptap/extension-superscript": "3.32.0",
     "@tiptap/extension-table": "3.32.0",
     "@tiptap/extension-text-align": "3.32.0",
+    "@tiptap/extension-text-style": "3.32.0",
     "@tiptap/extension-youtube": "3.32.0",
     "@tiptap/extensions": "3.32.0",
     "@tiptap/pm": "3.32.0",
@@ -28,5 +39,17 @@
     "@tiptap/starter-kit": "3.32.0",
     "@tiptap/suggestion": "3.32.0",
     "lucide-react": "1.56.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "esbuild": "0.25.12",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p .",
+    "test": "node scripts/test.mjs"
   }
 }
