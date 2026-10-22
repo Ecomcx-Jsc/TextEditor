@@ -3,7 +3,7 @@
  *   --cms-ed-bg, --cms-ed-panel, --cms-ed-fg, --cms-ed-muted, --cms-ed-faint, --cms-ed-line, --cms-ed-hover,
  *   --cms-ed-accent, --cms-ed-accent-soft, --cms-ed-accent-fg, --cms-ed-danger, --cms-ed-code-bg, --cms-ed-font
  */
-:where(.cms-editor, .cms-ed-slash, .cms-ed-bubble) {
+:where(.cms-editor, .cms-ed-slash, .cms-ed-bubble, .cms-ed-ask, .cms-ed-handle) {
   /* :where → độ ưu tiên 0: ứng dụng nhúng ghi đè được dù CSS này nạp sau */
   --cms-ed-panel: #fff; --cms-ed-fg: #18181b; --cms-ed-muted: #71717a; --cms-ed-faint: #a1a1aa; --cms-ed-line: #e4e4e7;
   --cms-ed-hover: #f4f4f5; --cms-ed-accent: #4f46e5; --cms-ed-accent-soft: #eef2ff; --cms-ed-accent-fg: #fff; --cms-ed-danger: #dc2626;
@@ -104,3 +104,37 @@
 .cms-ed-unknown { border-style: dashed; color: var(--cms-ed-faint); font-size: 13px; }
 .cms-ed-unknown-inline { display: inline-block; padding: 0 4px; border: 1px dashed var(--cms-ed-line); border-radius: 4px; font-size: 12px; color: var(--cms-ed-faint); }
 .cms-ed-unknown-mark { text-decoration: underline dotted; }
+
+/* Tay kéo + menu khối */
+.cms-ed-handle { position: fixed; z-index: 30; display: flex; gap: 1px; }
+.cms-ed-handle-btn { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 0; border-radius: 5px;
+  background: transparent; color: var(--cms-ed-faint); cursor: pointer; }
+.cms-ed-handle-btn:hover, .cms-ed-handle-btn.is-active { background: var(--cms-ed-hover); color: var(--cms-ed-fg); }
+.cms-ed-handle-btn.is-grip { cursor: grab; }
+.cms-ed-handle-btn.is-grip:active { cursor: grabbing; }
+.cms-ed-menu { position: absolute; top: 28px; left: 24px; min-width: 220px; padding: 4px; border: 1px solid var(--cms-ed-line); border-radius: 10px;
+  background: var(--cms-ed-panel); color: var(--cms-ed-fg); box-shadow: 0 16px 40px rgb(0 0 0 / .18); }
+.cms-ed-menu-item { display: flex; width: 100%; align-items: center; gap: 8px; padding: 6px 8px; border: 0; border-radius: 6px; background: transparent;
+  color: inherit; font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
+.cms-ed-menu-item span { flex: 1; }
+.cms-ed-menu-item kbd { font: 11px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--cms-ed-muted); }
+.cms-ed-menu-item:hover, .cms-ed-menu-item:focus-visible { background: var(--cms-ed-hover); outline: none; }
+.cms-ed-menu-item:disabled { opacity: .4; cursor: default; }
+.cms-ed-menu-item.is-danger { color: var(--cms-ed-danger); }
+@media (max-width: 768px) { .cms-ed-handle { display: none; } }
+
+/* Hộp nhập cạnh chỗ soạn (thay window.prompt) */
+.cms-ed-ask { position: fixed; z-index: 1001; display: grid; gap: 10px; width: min(360px, calc(100vw - 16px)); padding: 12px; border: 1px solid var(--cms-ed-line);
+  border-radius: 10px; background: var(--cms-ed-panel); color: var(--cms-ed-fg); font-family: var(--cms-ed-font); box-shadow: 0 16px 40px rgb(0 0 0 / .18); }
+.cms-ed-ask-title { font-size: 13px; font-weight: 600; }
+.cms-ed-ask-field { display: grid; gap: 4px; font-size: 12px; color: var(--cms-ed-muted); }
+.cms-ed-ask-field input, .cms-ed-ask-field textarea, .cms-ed-ask-field select { font: inherit; font-size: 13px; color: var(--cms-ed-fg); background: var(--cms-ed-panel);
+  border: 1px solid var(--cms-ed-line); border-radius: 6px; padding: 6px 8px; }
+.cms-ed-ask-field :focus-visible, .cms-ed-ask-check input:focus-visible, .cms-ed-ask-btn:focus-visible, .cms-ed-handle-btn:focus-visible { outline: 2px solid var(--cms-ed-accent); outline-offset: 1px; }
+.cms-ed-ask-check { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.cms-ed-ask-actions { display: flex; align-items: center; gap: 6px; }
+.cms-ed-ask-spacer { flex: 1; }
+.cms-ed-ask-btn { border: 1px solid var(--cms-ed-line); border-radius: 6px; padding: 5px 10px; background: var(--cms-ed-panel); color: var(--cms-ed-fg); font: inherit; font-size: 13px; cursor: pointer; }
+.cms-ed-ask-btn:hover { background: var(--cms-ed-hover); }
+.cms-ed-ask-btn.is-primary { border-color: var(--cms-ed-accent); background: var(--cms-ed-accent); color: var(--cms-ed-accent-fg); }
+.cms-ed-ask-btn.is-danger { border-color: transparent; color: var(--cms-ed-danger); }

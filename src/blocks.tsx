@@ -5,6 +5,7 @@ import { Blocks, type LucideIcon } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
 import { registerEditorExtension, unregisterEditorExtension } from "./registry";
 import { cx } from "./util";
+import { markContainer } from "./blockops";
 
 /** Props của phần xem trước tuỳ chỉnh trong trình soạn (tuỳ chọn — mặc định trình soạn tự hiển thị). */
 export interface BlockEditProps {
@@ -79,6 +80,8 @@ function Settings({ def, attrs, setAttrs, t }: { def: BlockDefinition; attrs: Re
 /** Node TipTap sinh từ định nghĩa khối — plugin không cần biết TipTap. */
 export function blockNode(def: BlockDefinition, opts: RegisterBlockOptions = {}) {
   const t = opts.translate ?? ((s: string) => s);
+  // Khối chứa khối khác: khối con bên trong có tay kéo + menu riêng
+  if (def.content === "blocks") markContainer(def.name);
   const Icon = opts.icon ?? Blocks;
   const hasContent = def.content !== "none";
   function View({ node, selected, updateAttributes, editor, getPos }: ReactNodeViewProps) {

@@ -6,6 +6,9 @@ Trình soạn thảo nội dung dạng khối dựa trên [TipTap](https://tipta
 - Ảnh responsive: srcset JPEG + WebP, **kéo góc để đổi kích thước**, chọn cỡ, căn lề (bao chữ / rộng), alt, chú thích
 - Bộ sưu tập ảnh, video, âm thanh, tệp tải xuống (PDF hiển thị ngay)
 - Slash menu (gõ `/`), menu nổi khi bôi đen, phím tắt (⌘B, ⌘I, ⌘K…)
+- Thao tác khối: tay kéo bên trái khối (kéo để di chuyển, bấm mở menu lên / xuống / nhân bản / xoá / chọn khối cha), nút "+" thêm khối bên dưới; phím tắt ⌘⇧↑ ⌘⇧↓ ⌘⇧D ⌘⇧⌫, Alt+F10 mở menu khối bằng bàn phím
+- Hộp nhập đặt cạnh chỗ soạn (liên kết, alt, chú thích, YouTube, shortcode) thay `window.prompt` — gói mở rộng dùng chung qua `askOf(editor)(…)`
+- Trợ năng: vùng soạn `role="textbox"` + `aria-multiline` + `aria-label` (prop `ariaLabel`), menu theo WAI-ARIA
 - Chữ giao diện tiếng Việt / tiếng Anh (hoặc tự dịch), CSS riêng đổi màu bằng biến
 - Plugin thêm khối: `registerEditorExtension`
 - Lưu dạng JSON (khối) — hiển thị ra HTML bằng renderer của theme hoặc `generateHTML` của TipTap

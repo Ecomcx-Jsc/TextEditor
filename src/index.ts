@@ -9,3 +9,6 @@ export { registerBlock, unregisterBlock, registeredBlocks, blockNode, type Block
 export { defineBlock, type BlockDefinition } from "@cms/content";
 /** Lớp TipTap cấp thấp (Node, Mark, Extension…) — cho ứng dụng nhúng cần viết extension riêng; plugin nên dùng defineBlock/registerBlock. */
 export { Node, Mark, Extension, mergeAttributes, getSchema } from "@tiptap/core";
+export { askOf, type Ask, type AskField, type AskOptions, type AskResult } from "./ask";
+export { blockFromPos, currentBlock, deleteBlock, duplicateBlock, insertParagraphAfter, markContainer, moveBlock, parentBlock, type BlockRef } from "./blockops";
+export { runBlockAction, type BlockAction } from "./handle";

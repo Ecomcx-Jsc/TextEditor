@@ -5,11 +5,12 @@ import { FileText, Music, Video as VideoIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { viLabels, type EditorLabels } from "./labels";
 import { cx } from "./util";
+import type { Ask } from "./ask";
 
 /** Ngữ cảnh dùng chung cho node view (chữ giao diện…), đặt bởi component Editor. */
-export const EditorContext = Extension.create<unknown, { labels: EditorLabels }>({
+export const EditorContext = Extension.create<unknown, { labels: EditorLabels; ask: Ask }>({
   name: "cmsEditorContext",
-  addStorage: () => ({ labels: viLabels }),
+  addStorage: () => ({ labels: viLabels, ask: async () => null }),
 });
 export const labelsOf = (editor: Editor): EditorLabels => (editor.storage as any).cmsEditorContext?.labels ?? viLabels;
 

@@ -7,7 +7,7 @@ import {
   AlignCenter, AlignLeft, AlignRight, Bold, Braces, Code, FileText, Heading2, Heading3, Heading4, ImageIcon, Images, Italic, Link2, List,
   ListOrdered, Maximize2, Minus, Music, Pilcrow, Quote, Redo2, SquareCode, Strikethrough, Table2, Underline, Undo2, Video, type LucideIcon,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { viLabels, type EditorLabels } from "./labels";
 import { galleryImage, imageAttrs } from "./media";
@@ -16,6 +16,8 @@ import { unwrapUnknown, wrapUnknown } from "./unknown";
 import { onExtensionsChange, registeredExtensions } from "./registry";
 import type { EditorExtensionPack, InsertItem, MediaItem, MediaKind, MediaProvider } from "./types";
 import { cx, norm } from "./util";
+import { AskPopover, askOf, createAskStore, type Ask } from "./ask";
+import { BlockHandle, BlockKeys } from "./handle";
 
 export interface EditorProps {
   /** Nội dung ban đầu (TipTap JSON hoặc HTML). */
@@ -32,6 +34,8 @@ export interface EditorProps {
   className?: string;
   /** Nhận đối tượng TipTap Editor để điều khiển từ bên ngoài. */
   onReady?(editor: TiptapEditor): void;
+  /** Tên vùng soạn cho trình đọc màn hình (mặc định labels.editorLabel). */
+  ariaLabel?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -57,14 +61,17 @@ function defaultItems(t: EditorLabels, requestMedia: RequestMedia): InsertItem[]
     { key: "audio", title: t.audio, hint: t.audioHint, icon: Music, keywords: "am thanh audio nhac mp3 podcast", run: (e, r) => { chain(e, r).run(); requestMedia(e, "audio"); } },
     { key: "file", title: t.file, hint: t.fileHint, icon: FileText, keywords: "tep file pdf tai xuong download tai lieu", run: (e, r) => { chain(e, r).run(); requestMedia(e, "file"); } },
     { key: "table", title: t.table, hint: "3 × 3", icon: Table2, keywords: "bang table", run: (e, r) => chain(e, r).insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run() },
-    { key: "youtube", title: t.youtube, hint: t.youtubeHint, icon: Video, keywords: "video youtube", run: (e, r) => {
-      const url = window.prompt(t.youtubePrompt);
-      if (url) chain(e, r).setYoutubeVideo({ src: url }).run(); else chain(e, r).run();
+    { key: "youtube", title: t.youtube, hint: t.youtubeHint, icon: Video, keywords: "video youtube", run: async (e, r) => {
+      chain(e, r).run();
+      const res = await askOf(e)({ title: t.youtube, fields: [{ key: "url", label: t.youtubePrompt, type: "url", placeholder: "https://www.youtube.com/watch?v=…" }], submit: t.insert });
+      if (res && res !== "remove" && res.url) e.chain().focus().setYoutubeVideo({ src: String(res.url) }).run();
     } },
     { key: "hr", title: t.hr, hint: t.hrHint, icon: Minus, keywords: "duong ke divider hr", run: (e, r) => chain(e, r).setHorizontalRule().run() },
-    { key: "shortcode", title: t.shortcode, hint: "[ten-shortcode]", icon: Braces, keywords: "shortcode plugin", run: (e, r) => {
-      const sc = window.prompt(t.shortcodePrompt);
-      if (sc) chain(e, r).insertContent({ type: "paragraph", content: [{ type: "text", text: `[${sc.replace(/^\[|\]$/g, "")}]` }] }).run(); else chain(e, r).run();
+    { key: "shortcode", title: t.shortcode, hint: "[ten-shortcode]", icon: Braces, keywords: "shortcode plugin", run: async (e, r) => {
+      chain(e, r).run();
+      const res = await askOf(e)({ title: t.shortcode, fields: [{ key: "sc", label: t.shortcodePrompt, placeholder: "contact-form" }], submit: t.insert });
+      const sc = res && res !== "remove" ? String(res.sc).trim().replace(/^\[|\]$/g, "") : "";
+      if (sc) e.chain().focus().insertContent({ type: "paragraph", content: [{ type: "text", text: `[${sc}]` }] }).run();
     } },
   ];
 }
@@ -180,13 +187,21 @@ function useMarks(editor: TiptapEditor) {
   });
 }
 
-function setLink(editor: TiptapEditor, t: EditorLabels) {
-  const prev = editor.getAttributes("link").href as string | undefined;
-  const url = window.prompt(t.linkPrompt, prev ?? "https://");
-  if (url === null) return;
+async function setLink(editor: TiptapEditor, t: EditorLabels) {
+  const prev = editor.getAttributes("link") as { href?: string; target?: string | null };
+  const res = await askOf(editor)({
+    title: t.link.replace(/\s*\(.*\)$/, ""),
+    fields: [
+      { key: "href", label: t.linkPrompt, type: "url", value: prev.href ?? "", placeholder: "https://" },
+      { key: "blank", label: t.linkNewTab, type: "checkbox", value: prev.href ? prev.target === "_blank" : false },
+    ],
+    remove: prev.href ? t.removeLink : undefined,
+  });
+  if (!res) return;
   const c = editor.chain().focus().extendMarkRange("link");
+  const url = res === "remove" ? "" : String(res.href).trim();
   if (url === "") c.unsetLink().run();
-  else c.setLink({ href: url, target: /^https?:/.test(url) && !url.includes(location.hostname) ? "_blank" : null }).run();
+  else c.setLink({ href: url, target: res !== "remove" && res.blank ? "_blank" : null }).run();
 }
 
 function Toolbar({ editor, t, requestMedia, items }: { editor: TiptapEditor; t: EditorLabels; requestMedia: RequestMedia; items: InsertItem[] }) {
@@ -265,8 +280,14 @@ function ImageMenu({ editor, t, media, requestMedia }: { editor: TiptapEditor; t
         <Sep />
         {aligns.map(([v, Icon, title]) => <Btn key={title} title={title} active={(attrs.align ?? null) === v} onClick={() => set({ align: v })}><Icon size={16} /></Btn>)}
         <Sep />
-        <button type="button" className="cms-ed-text-btn" onClick={() => { const v = window.prompt(t.altPrompt, attrs.alt ?? ""); if (v !== null) set({ alt: v }); }}>{t.alt}</button>
-        <button type="button" className="cms-ed-text-btn" onClick={() => { const v = window.prompt(t.captionPrompt, attrs.caption ?? ""); if (v !== null) set({ caption: v || null }); }}>{t.caption}</button>
+        <button type="button" className="cms-ed-text-btn" onClick={async () => {
+          const r = await askOf(editor)({ title: t.alt, fields: [{ key: "v", label: t.altPrompt, type: "textarea", value: attrs.alt ?? "" }] });
+          if (r && r !== "remove") set({ alt: String(r.v) });
+        }}>{t.alt}</button>
+        <button type="button" className="cms-ed-text-btn" onClick={async () => {
+          const r = await askOf(editor)({ title: t.caption, fields: [{ key: "v", label: t.captionPrompt, type: "textarea", value: attrs.caption ?? "" }] });
+          if (r && r !== "remove") set({ caption: String(r.v) || null });
+        }}>{t.caption}</button>
         <button type="button" className="cms-ed-text-btn" onClick={() => requestMedia(editor, "image")}>{t.replace}</button>
         {attrs.mediaId != null && media?.get && <button type="button" className="cms-ed-text-btn" onClick={() => resize(attrs.size ?? "large")}>{t.resetSize}</button>}
       </>}
@@ -280,12 +301,14 @@ function ImageMenu({ editor, t, media, requestMedia }: { editor: TiptapEditor; t
 /** Trình soạn nội dung. Dùng kèm CSS: import "@cms/editor/style.css". */
 const NO_PACKS: EditorExtensionPack[] = [];
 
-export function Editor({ initial, onChange, media, labels, extensions: localPacks = NO_PACKS, toolbarClassName, className, onReady }: EditorProps) {
+export function Editor({ initial, onChange, media, labels, extensions: localPacks = NO_PACKS, toolbarClassName, className, onReady, ariaLabel }: EditorProps) {
   const t = useMemo(() => ({ ...viLabels, ...labels }), [labels]);
   const slash = useMemo(createSlashStore, []);
   const globalPacks = useSyncExternalStore(onExtensionsChange, registeredExtensions);
   const packs = useMemo(() => [...globalPacks, ...localPacks], [globalPacks, localPacks]);
   const mediaRef = useRef(media); mediaRef.current = media;
+  const asker = useMemo(createAskStore, []);
+  const [menuRequest, setMenuRequest] = useState(0);
 
   // Chọn media → chèn node phù hợp. Không có MediaProvider: ảnh/video nhập bằng URL.
   const requestMedia: RequestMedia = async (editor, kind) => {
@@ -293,7 +316,8 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
     let list: MediaItem[] = [];
     if (provider) list = await provider.pick({ kind, multiple: kind === "gallery" });
     else {
-      const url = window.prompt(t.imageUrlPrompt);
+      const res = await asker.ask({ title: kind === "video" ? t.video : t.image, fields: [{ key: "url", label: t.imageUrlPrompt, type: "url", placeholder: "https://" }], submit: t.insert });
+      const url = res && res !== "remove" ? String(res.url).trim() : "";
       if (url) list = [{ id: url, url, mimeType: kind === "video" ? "video/mp4" : "image/*", fileName: url.split("/").pop() ?? url }];
     }
     if (!list.length) return;
@@ -315,13 +339,15 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
       ...coreExtensions(),
       Placeholder.configure({ placeholder: ({ node }) => (node.type.name === "heading" ? t.headingPlaceholder : t.placeholder), showOnlyCurrent: true }),
       slashExtension(slash, () => itemsRef.current),
+      BlockKeys.configure({ openMenu: () => setMenuRequest((n) => n + 1) }),
       ...packs.flatMap((p) => p.extensions ?? []),
     ],
     // Khối / định dạng lạ (plugin đã tắt) được bọc giữ nguyên thay vì làm trình soạn báo lỗi
     content: initial && typeof initial === "object" ? wrapUnknown(initial, knownTypes(packs.flatMap((p) => p.extensions ?? []))) : initial || "",
     onUpdate: ({ editor: e }) => onChange(unwrapUnknown(e.getJSON() as any)),
     editorProps: {
-      attributes: { class: "cms-ed-content" },
+      // Vùng soạn là ô nhập nhiều dòng có tên (axe: aria-input-field-name)
+      attributes: { class: "cms-ed-content", role: "textbox", "aria-multiline": "true", "aria-label": ariaLabel ?? t.editorLabel },
       handleKeyDown: (_view, event) => {
         if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k" && editor) { event.preventDefault(); event.stopPropagation(); setLink(editor, t); return true; }
         return false;
@@ -330,7 +356,12 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
     immediatelyRender: true,
   }, [packs.map((p) => p.name).join(",")]);
 
-  useEffect(() => { if (editor) { (editor.storage as any).cmsEditorContext.labels = t; onReady?.(editor); } }, [editor, t]);
+  useEffect(() => {
+    if (!editor) return;
+    const ctx = (editor.storage as any).cmsEditorContext as { labels: EditorLabels; ask: Ask };
+    ctx.labels = t; ctx.ask = asker.ask;
+    onReady?.(editor);
+  }, [editor, t]);
 
   return (
     <div className={cx("cms-editor", className)}>
@@ -339,6 +370,8 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
       {editor && <ImageMenu editor={editor} t={t} media={media} requestMedia={requestMedia} />}
       <EditorContent editor={editor} />
       <SlashMenu store={slash} t={t} />
+      {editor && <BlockHandle editor={editor} t={t} menuRequest={menuRequest} />}
+      {editor && <AskPopover store={asker} editor={editor} t={t} />}
     </div>
   );
 }
