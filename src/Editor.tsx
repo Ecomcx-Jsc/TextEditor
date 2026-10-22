@@ -2,6 +2,7 @@ import { Extension, type Editor as TiptapEditor, type Range } from "@tiptap/core
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react/menus";
 import { Placeholder } from "@tiptap/extensions";
+import { NodeSelection } from "@tiptap/pm/state";
 import Suggestion, { type SuggestionProps } from "@tiptap/suggestion";
 import {
   AlignCenter, AlignLeft, AlignRight, Bold, Braces, Code, FileText, Heading2, Heading3, Heading4, ImageIcon, Images, Italic, Link2, List,
@@ -18,6 +19,9 @@ import type { EditorExtensionPack, InsertItem, MediaItem, MediaKind, MediaProvid
 import { cx, norm } from "./util";
 import { AskPopover, askOf, createAskStore, type Ask } from "./ask";
 import { BlockHandle, BlockKeys } from "./handle";
+import { BlockSettingsBar, layoutItems } from "./layoutUi";
+import { cleanPastedHtml, isUrl } from "./paste";
+import { embedInfo } from "@cms/content";
 
 export interface EditorProps {
   /** Nội dung ban đầu (TipTap JSON hoặc HTML). */
@@ -66,6 +70,7 @@ function defaultItems(t: EditorLabels, requestMedia: RequestMedia): InsertItem[]
       const res = await askOf(e)({ title: t.youtube, fields: [{ key: "url", label: t.youtubePrompt, type: "url", placeholder: "https://www.youtube.com/watch?v=…" }], submit: t.insert });
       if (res && res !== "remove" && res.url) e.chain().focus().setYoutubeVideo({ src: String(res.url) }).run();
     } },
+    ...layoutItems(t),
     { key: "hr", title: t.hr, hint: t.hrHint, icon: Minus, keywords: "duong ke divider hr", run: (e, r) => chain(e, r).setHorizontalRule().run() },
     { key: "shortcode", title: t.shortcode, hint: "[ten-shortcode]", icon: Braces, keywords: "shortcode plugin", run: async (e, r) => {
       chain(e, r).run();
@@ -243,7 +248,7 @@ function SelectionMenu({ editor, t }: { editor: TiptapEditor; t: EditorLabels })
   const s = useMarks(editor);
   const c = () => editor.chain().focus();
   return (
-    <BubbleMenu editor={editor} shouldShow={({ editor: e, from, to }) => from !== to && !e.isActive("image") && !e.isActive("codeBlock")} className="cms-ed-bubble">
+    <BubbleMenu editor={editor} shouldShow={({ editor: e, from, to }) => from !== to && !(e.state.selection instanceof NodeSelection) && !e.isActive("codeBlock")} className="cms-ed-bubble">
       <Btn title={t.bold} active={s.bold} onClick={() => c().toggleBold().run()}><Bold size={16} /></Btn>
       <Btn title={t.italic} active={s.italic} onClick={() => c().toggleItalic().run()}><Italic size={16} /></Btn>
       <Btn title={t.underline} active={s.underline} onClick={() => c().toggleUnderline().run()}><Underline size={16} /></Btn>
@@ -292,6 +297,21 @@ function ImageMenu({ editor, t, media, requestMedia }: { editor: TiptapEditor; t
         {attrs.mediaId != null && media?.get && <button type="button" className="cms-ed-text-btn" onClick={() => resize(attrs.size ?? "large")}>{t.resetSize}</button>}
       </>}
     </BubbleMenu>
+  );
+}
+
+/** Đếm từ / ký tự / thời gian đọc (200 từ mỗi phút) — dưới vùng soạn. */
+function Stats({ editor, t }: { editor: TiptapEditor; t: EditorLabels }) {
+  const s = useEditorState({ editor, selector: ({ editor: e }) => {
+    const text = e.state.doc.textBetween(0, e.state.doc.content.size, "\n", "\n");
+    const words = text.split(/\s+/).filter(Boolean).length;
+    return { words, chars: text.replace(/\n/g, "").length };
+  } });
+  const fmt = (tpl: string, n: number) => tpl.replace("{n}", n.toLocaleString());
+  return (
+    <div className="cms-ed-stats" aria-label={t.stats}>
+      <span>{fmt(t.words, s.words)}</span><span>{fmt(t.chars, s.chars)}</span>{s.words > 0 && <span>{fmt(t.readingTime, Math.max(1, Math.round(s.words / 200)))}</span>}
+    </div>
   );
 }
 
@@ -348,6 +368,17 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
     editorProps: {
       // Vùng soạn là ô nhập nhiều dòng có tên (axe: aria-input-field-name)
       attributes: { class: "cms-ed-content", role: "textbox", "aria-multiline": "true", "aria-label": ariaLabel ?? t.editorLabel },
+      // Dán từ Word / Google Docs: bỏ style, font, màu, thẻ Office; danh sách Word thành danh sách thật
+      transformPastedHTML: (html) => cleanPastedHtml(html),
+      // Dán một đường dẫn của nhà cung cấp hỗ trợ vào dòng trống → khối nhúng
+      handlePaste: (view, event) => {
+        const text = event.clipboardData?.getData("text/plain") ?? "";
+        const { $from, empty } = view.state.selection;
+        if (!empty || !isUrl(text) || $from.parent.type.name !== "paragraph" || $from.parent.content.size > 0 || !embedInfo(text.trim())) return false;
+        const node = view.state.schema.nodes.embed.create({ url: text.trim() });
+        view.dispatch(view.state.tr.replaceWith($from.before(), $from.after(), node).scrollIntoView());
+        return true;
+      },
       handleKeyDown: (_view, event) => {
         if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k" && editor) { event.preventDefault(); event.stopPropagation(); setLink(editor, t); return true; }
         return false;
@@ -372,6 +403,8 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
       <SlashMenu store={slash} t={t} />
       {editor && <BlockHandle editor={editor} t={t} menuRequest={menuRequest} />}
       {editor && <AskPopover store={asker} editor={editor} t={t} />}
+      {editor && <BlockSettingsBar editor={editor} t={t} />}
+      {editor && <Stats editor={editor} t={t} />}
     </div>
   );
 }

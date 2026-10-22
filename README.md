@@ -5,6 +5,9 @@ Trình soạn thảo nội dung dạng khối dựa trên [TipTap](https://tipta
 - Đoạn văn, tiêu đề, danh sách, trích dẫn, khối mã, bảng, đường kẻ, YouTube, shortcode
 - Ảnh responsive: srcset JPEG + WebP, **kéo góc để đổi kích thước**, chọn cỡ, căn lề (bao chữ / rộng), alt, chú thích
 - Bộ sưu tập ảnh, video, âm thanh, tệp tải xuống (PDF hiển thị ngay)
+- Khối bố cục (`@cms/content` ≥ 1.2): cột (2–4, bố cục 50/50, 33/67…, căn dọc, xếp dọc trên điện thoại), nhóm (nền, màu chữ, khoảng đệm), hộp lưu ý (4 kiểu + tiêu đề), nút (chữ, liên kết, kiểu, căn lề), nhúng theo đường dẫn (YouTube, Vimeo, Spotify, SoundCloud, TikTok, X, Instagram, CodePen, Figma, Google Maps… — `embedInfo`); thanh cài đặt khối hiện phía trên khối đang soạn
+- Dán từ Word / Google Docs sạch (`cleanPastedHtml`: định dạng bằng style → đậm/nghiêng/gạch chân; bỏ font, màu, thẻ Office; danh sách Word thành danh sách thật); dán một đường dẫn hỗ trợ nhúng vào dòng trống → khối nhúng
+- Đếm từ, ký tự, thời gian đọc dưới vùng soạn
 - Slash menu (gõ `/`), menu nổi khi bôi đen, phím tắt (⌘B, ⌘I, ⌘K…)
 - Thao tác khối: tay kéo bên trái khối (kéo để di chuyển, bấm mở menu lên / xuống / nhân bản / xoá / chọn khối cha), nút "+" thêm khối bên dưới; phím tắt ⌘⇧↑ ⌘⇧↓ ⌘⇧D ⌘⇧⌫, Alt+F10 mở menu khối bằng bàn phím
 - Hộp nhập đặt cạnh chỗ soạn (liên kết, alt, chú thích, YouTube, shortcode) thay `window.prompt` — gói mở rộng dùng chung qua `askOf(editor)(…)`

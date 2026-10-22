@@ -10,6 +10,7 @@ import Highlight from "@tiptap/extension-highlight";
 import { Color, TextStyle } from "@tiptap/extension-text-style";
 import { AudioNode, CmsImage, EditorContext, FileNode, Gallery, VideoNode } from "./nodes";
 import { UnknownBlock, UnknownInline, UnknownMark } from "./unknown";
+import { layoutExtensions } from "./layout";
 
 /**
  * Mọi khối + định dạng lõi mà trình soạn hiểu — khớp với định dạng nội dung của CMS (@cms/content CORE_NODES/CORE_MARKS):
@@ -25,6 +26,7 @@ export function coreExtensions(): AnyExtension[] {
     TableKit.configure({ table: { resizable: false } }),
     TaskList, TaskItem.configure({ nested: true }),
     Subscript, Superscript, Highlight.configure({ multicolor: true }), TextStyle, Color,
+    ...layoutExtensions(),
     UnknownBlock, UnknownInline, UnknownMark,
   ];
 }

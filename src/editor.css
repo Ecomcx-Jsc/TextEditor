@@ -3,7 +3,7 @@
  *   --cms-ed-bg, --cms-ed-panel, --cms-ed-fg, --cms-ed-muted, --cms-ed-faint, --cms-ed-line, --cms-ed-hover,
  *   --cms-ed-accent, --cms-ed-accent-soft, --cms-ed-accent-fg, --cms-ed-danger, --cms-ed-code-bg, --cms-ed-font
  */
-:where(.cms-editor, .cms-ed-slash, .cms-ed-bubble, .cms-ed-ask, .cms-ed-handle) {
+:where(.cms-editor, .cms-ed-slash, .cms-ed-bubble, .cms-ed-ask, .cms-ed-handle, .cms-ed-bar) {
   /* :where → độ ưu tiên 0: ứng dụng nhúng ghi đè được dù CSS này nạp sau */
   --cms-ed-panel: #fff; --cms-ed-fg: #18181b; --cms-ed-muted: #71717a; --cms-ed-faint: #a1a1aa; --cms-ed-line: #e4e4e7;
   --cms-ed-hover: #f4f4f5; --cms-ed-accent: #4f46e5; --cms-ed-accent-soft: #eef2ff; --cms-ed-accent-fg: #fff; --cms-ed-danger: #dc2626;
@@ -138,3 +138,51 @@
 .cms-ed-ask-btn:hover { background: var(--cms-ed-hover); }
 .cms-ed-ask-btn.is-primary { border-color: var(--cms-ed-accent); background: var(--cms-ed-accent); color: var(--cms-ed-accent-fg); }
 .cms-ed-ask-btn.is-danger { border-color: transparent; color: var(--cms-ed-danger); }
+
+/* Khối bố cục (cột, nhóm, hộp lưu ý, nút, nhúng) */
+.cms-ed-columns { display: flex; gap: 16px; margin: 1rem 0; }
+.cms-ed-columns.is-center { align-items: center; }
+.cms-ed-columns.is-bottom { align-items: flex-end; }
+.cms-ed-column { min-width: 0; padding: 6px 10px; border: 1px dashed var(--cms-ed-line); border-radius: 8px; }
+.cms-ed-column > * + * { margin-top: .85em; }
+.cms-ed-group { margin: 1rem 0; border: 1px dashed var(--cms-ed-line); border-radius: 12px; }
+.cms-ed-group > * + *, .cms-ed-callout > * + * { margin-top: .85em; }
+.cms-ed-callout { margin: 1rem 0; padding: 10px 14px; border-left: 4px solid var(--cms-ed-tone, #2563eb); border-radius: 8px;
+  background: color-mix(in srgb, var(--cms-ed-tone, #2563eb) 8%, transparent); }
+.cms-ed-callout[data-tone="success"] { --cms-ed-tone: #16a34a; }
+.cms-ed-callout[data-tone="warning"] { --cms-ed-tone: #d97706; }
+.cms-ed-callout[data-tone="danger"] { --cms-ed-tone: #dc2626; }
+.cms-ed-callout[data-title]::before { content: attr(data-title); display: block; font-weight: 600; margin-bottom: 2px; }
+.cms-ed-button-wrap { margin: 1rem 0; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; border-radius: 8px; }
+.cms-ed-button-wrap.is-center { align-items: center; }
+.cms-ed-button-wrap.is-right { align-items: flex-end; }
+.cms-ed-button-wrap.is-selected .cms-ed-button { outline: 2px solid var(--cms-ed-accent); outline-offset: 2px; }
+.cms-ed-button { display: inline-block; padding: .55em 1.1em; border-radius: 8px; font-weight: 600; line-height: 1.2; cursor: default;
+  background: var(--cms-ed-accent); color: var(--cms-ed-accent-fg); }
+.cms-ed-button.is-secondary { background: var(--cms-ed-hover); color: var(--cms-ed-fg); }
+.cms-ed-button.is-outline { background: transparent; color: var(--cms-ed-accent); border: 1px solid var(--cms-ed-accent); }
+.cms-ed-button-href { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; color: var(--cms-ed-faint); }
+.cms-ed-embed-frame { position: relative; width: 100%; }
+.cms-ed-embed-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; border-radius: 6px; }
+.cms-ed-embed-cover { position: absolute; inset: 0; }
+.cms-ed-embed-unknown { display: flex; align-items: center; gap: 6px; font-size: 13px; overflow: hidden; }
+.cms-ed-embed-unknown span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cms-ed-embed-unknown small { color: var(--cms-ed-muted); flex-shrink: 0; }
+.cms-ed-embed-caption { margin-top: 4px; font-size: 12px; color: var(--cms-ed-muted); }
+
+/* Thanh cài đặt khối */
+.cms-ed-bar { position: fixed; z-index: 31; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; max-width: calc(100vw - 16px); padding: 4px 6px;
+  border: 1px solid var(--cms-ed-line); border-radius: 10px; background: var(--cms-ed-panel); color: var(--cms-ed-fg); font-size: 12px; box-shadow: 0 10px 30px rgb(0 0 0 / .14); }
+.cms-ed-seg { display: inline-flex; padding: 2px; gap: 2px; border-radius: 7px; background: var(--cms-ed-hover); }
+.cms-ed-seg-btn { display: inline-flex; align-items: center; border: 0; border-radius: 5px; padding: 3px 7px; background: transparent; color: var(--cms-ed-muted); font: inherit; font-size: 12px; cursor: pointer; }
+.cms-ed-seg-btn.is-active { background: var(--cms-ed-panel); color: var(--cms-ed-fg); box-shadow: 0 1px 2px rgb(0 0 0 / .12); }
+.cms-ed-seg-btn:focus-visible, .cms-ed-bar .cms-ed-text-btn:focus-visible, .cms-ed-bar input:focus-visible { outline: 2px solid var(--cms-ed-accent); outline-offset: 1px; }
+.cms-ed-bar .cms-ed-text-btn { display: inline-flex; align-items: center; gap: 4px; }
+.cms-ed-bar .cms-ed-text-btn:disabled { opacity: .4; cursor: default; }
+.cms-ed-check { display: inline-flex; align-items: center; gap: 4px; color: var(--cms-ed-muted); }
+.cms-ed-color, .cms-ed-color-label { display: inline-flex; align-items: center; gap: 4px; color: var(--cms-ed-muted); }
+.cms-ed-color input[type="color"] { width: 22px; height: 22px; padding: 0; border: 1px solid var(--cms-ed-line); border-radius: 5px; background: none; cursor: pointer; }
+.cms-ed-bar-note { color: var(--cms-ed-muted); }
+
+/* Đếm từ */
+.cms-ed-stats { display: flex; gap: 12px; justify-content: flex-end; padding: 6px 0; border-top: 1px solid var(--cms-ed-line); font-size: 12px; color: var(--cms-ed-muted); }

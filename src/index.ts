@@ -12,3 +12,5 @@ export { Node, Mark, Extension, mergeAttributes, getSchema } from "@tiptap/core"
 export { askOf, type Ask, type AskField, type AskOptions, type AskResult } from "./ask";
 export { blockFromPos, currentBlock, deleteBlock, duplicateBlock, insertParagraphAfter, markContainer, moveBlock, parentBlock, type BlockRef } from "./blockops";
 export { runBlockAction, type BlockAction } from "./handle";
+export { Columns, Column, Group, Callout, ButtonNode, EmbedNode, COLUMN_PRESETS, setColumnCount, setColumnWidths } from "./layout";
+export { cleanPastedHtml } from "./paste";

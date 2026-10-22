@@ -1,5 +1,14 @@
 /** Chữ giao diện của trình soạn. Truyền labels={enLabels} hoặc ghi đè từng chữ. */
 export const viLabels = {
+  columns2: "2 cột", columns3: "3 cột", columnsHint: "Chia nội dung thành cột", group: "Nhóm", groupHint: "Khung bao nhiều khối (nền, khoảng đệm)",
+  callout: "Hộp lưu ý", calloutHint: "Thông tin, cảnh báo…", button: "Nút", buttonHint: "Nút liên kết", buttonEmpty: "Nút", buttonText: "Chữ trên nút", buttonUrl: "Liên kết",
+  embed: "Nhúng", embedHint: "YouTube, Vimeo, Spotify, TikTok, X…", embedUrl: "Đường dẫn (YouTube, Vimeo, Spotify, TikTok, X, Instagram…)",
+  embedUnsupported: "Không nhúng được — website hiện thành liên kết", edit: "Sửa", blockSettings: "Cài đặt khối", layout: "Bố cục",
+  addColumn: "+ cột", removeColumn: "− cột", vAlign: "Căn dọc", vTop: "Trên", vCenter: "Giữa", vBottom: "Dưới", stack: "Xếp dọc trên điện thoại",
+  background: "Nền", textColor: "Chữ", noColor: "Bỏ màu", padding: "Khoảng đệm", padNone: "Không", padSmall: "Nhỏ", padMedium: "Vừa", padLarge: "Lớn",
+  tone: "Kiểu", toneInfo: "Thông tin", toneSuccess: "Thành công", toneWarning: "Cảnh báo", toneDanger: "Nguy hiểm", calloutTitle: "Tiêu đề hộp",
+  variant: "Kiểu nút", variantPrimary: "Chính", variantSecondary: "Phụ", variantOutline: "Viền",
+  stats: "Thống kê nội dung", words: "{n} từ", chars: "{n} ký tự", readingTime: "~{n} phút đọc",
   editorLabel: "Nội dung bài viết", apply: "Áp dụng", insert: "Chèn", cancel: "Huỷ", removeLink: "Gỡ liên kết", linkNewTab: "Mở trong tab mới",
   blockOptions: "Tuỳ chọn khối (kéo để di chuyển)", addBelow: "Thêm khối bên dưới", moveUp: "Lên trên", moveDown: "Xuống dưới",
   duplicate: "Nhân bản", deleteBlock: "Xoá khối", selectParent: "Chọn khối cha",
@@ -31,6 +40,15 @@ export const viLabels = {
 export type EditorLabels = typeof viLabels;
 
 export const enLabels: EditorLabels = {
+  columns2: "2 columns", columns3: "3 columns", columnsHint: "Split content into columns", group: "Group", groupHint: "Box around blocks (background, padding)",
+  callout: "Callout", calloutHint: "Info, warning…", button: "Button", buttonHint: "Link button", buttonEmpty: "Button", buttonText: "Button text", buttonUrl: "Link",
+  embed: "Embed", embedHint: "YouTube, Vimeo, Spotify, TikTok, X…", embedUrl: "URL (YouTube, Vimeo, Spotify, TikTok, X, Instagram…)",
+  embedUnsupported: "Cannot embed — shown as a link on the website", edit: "Edit", blockSettings: "Block settings", layout: "Layout",
+  addColumn: "+ column", removeColumn: "− column", vAlign: "Vertical align", vTop: "Top", vCenter: "Middle", vBottom: "Bottom", stack: "Stack on mobile",
+  background: "Background", textColor: "Text", noColor: "Clear", padding: "Padding", padNone: "None", padSmall: "Small", padMedium: "Medium", padLarge: "Large",
+  tone: "Style", toneInfo: "Info", toneSuccess: "Success", toneWarning: "Warning", toneDanger: "Danger", calloutTitle: "Callout title",
+  variant: "Button style", variantPrimary: "Primary", variantSecondary: "Secondary", variantOutline: "Outline",
+  stats: "Content statistics", words: "{n} words", chars: "{n} characters", readingTime: "~{n} min read",
   editorLabel: "Post content", apply: "Apply", insert: "Insert", cancel: "Cancel", removeLink: "Remove link", linkNewTab: "Open in new tab",
   blockOptions: "Block options (drag to move)", addBelow: "Add block below", moveUp: "Move up", moveDown: "Move down",
   duplicate: "Duplicate", deleteBlock: "Delete block", selectParent: "Select parent block",
