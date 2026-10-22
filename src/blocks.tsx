@@ -1,5 +1,5 @@
 import { Node, mergeAttributes } from "@tiptap/core";
-import { NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer, type ReactNodeViewProps } from "@tiptap/react";
+import { NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer, useEditorState, type ReactNodeViewProps } from "@tiptap/react";
 import { BLOCK_VERSION_ATTR, blockDefaults, type BlockAttrSpec, type BlockDefinition } from "@cms/content";
 import { Blocks, type LucideIcon } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
@@ -81,15 +81,24 @@ export function blockNode(def: BlockDefinition, opts: RegisterBlockOptions = {})
   const t = opts.translate ?? ((s: string) => s);
   const Icon = opts.icon ?? Blocks;
   const hasContent = def.content !== "none";
-  function View({ node, selected, updateAttributes }: ReactNodeViewProps) {
+  function View({ node, selected, updateAttributes, editor, getPos }: ReactNodeViewProps) {
     const attrs = node.attrs as Record<string, any>;
+    // Form cài đặt hiện khi khối được chọn hoặc con trỏ đang ở bên trong khối
+    const inside = useEditorState({ editor, selector: ({ editor: e }) => {
+      const pos = getPos();
+      if (typeof pos !== "number") return false;
+      const { from, to } = e.state.selection;
+      return from >= pos && to <= pos + node.nodeSize;
+    } });
+    const active = selected || inside;
+    const selectBlock = (e: { preventDefault(): void }) => { e.preventDefault(); const pos = getPos(); if (typeof pos === "number") editor.commands.setNodeSelection(pos); };
     const setAttrs = (a: Record<string, unknown>) => updateAttributes(a);
     const inner = hasContent ? <NodeViewContent className="cms-ed-block-content" /> : null;
     return (
-      <NodeViewWrapper className={cx("cms-ed-block", "cms-ed-plugin-block", selected && "is-selected")} data-block={def.name}>
-        <div className="cms-ed-block-label" contentEditable={false} data-drag-handle><Icon size={12} /> {t(def.title)}</div>
-        {opts.edit ? <opts.edit attrs={attrs} setAttrs={setAttrs} selected={selected}>{inner}</opts.edit> : inner}
-        {selected && <Settings def={def} attrs={attrs} setAttrs={setAttrs} t={t} />}
+      <NodeViewWrapper className={cx("cms-ed-block", "cms-ed-plugin-block", active && "is-selected")} data-block={def.name}>
+        <div className="cms-ed-block-label" contentEditable={false} data-drag-handle onMouseDown={selectBlock}><Icon size={12} /> {t(def.title)}</div>
+        {opts.edit ? <opts.edit attrs={attrs} setAttrs={setAttrs} selected={active}>{inner}</opts.edit> : inner}
+        {active && <Settings def={def} attrs={attrs} setAttrs={setAttrs} t={t} />}
       </NodeViewWrapper>
     );
   }
