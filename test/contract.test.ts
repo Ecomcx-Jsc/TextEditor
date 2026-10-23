@@ -91,3 +91,15 @@ test("registerBlockPanel: thuộc tính plugin thêm vào khối lõi được t
     assert.equal(roundTrip(content).saved.blocks[0].data.content[0].attrs.lazy, false);
   } finally { unregisterBlockPanel("demo/lazy"); }
 });
+
+test("khối động: đăng ký xong thì fixture dynamic-blocks mở + lưu lại bằng node thật (không qua khối lạ)", async () => {
+  const { registerDynamicBlocks, DYNAMIC_BLOCKS } = await import("../src/dynamic");
+  registerDynamicBlocks("vi");
+  try {
+    const f = fixtures.find((x) => x.name === "dynamic-blocks")!;
+    const { saved, schema } = roundTrip(f.input);
+    for (const name of DYNAMIC_BLOCKS) assert.ok(schema.nodes[name], `thiếu node ${name}`);
+    assert.ok(!JSON.stringify(saved).includes("unknown"), "không được bọc thành khối lạ");
+    assert.deepEqual(stripDefaults(saved, schema), stripDefaults(normalizeContent(f.expected).doc, schema));
+  } finally { for (const name of DYNAMIC_BLOCKS) unregisterBlock(name); }
+});

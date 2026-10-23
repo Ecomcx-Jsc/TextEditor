@@ -15,6 +15,7 @@ import { galleryImage, imageAttrs } from "./media";
 import { coreExtensions, knownTypes } from "./extensions";
 import { unwrapUnknown, wrapUnknown } from "./unknown";
 import { onExtensionsChange, registeredExtensions } from "./registry";
+import { DYNAMIC_BLOCKS } from "./dynamic";
 import type { EditorExtensionPack, InsertItem, MediaItem, MediaKind, MediaProvider } from "./types";
 import { cx } from "./util";
 import { rankItems } from "./rank";
@@ -43,6 +44,8 @@ export interface EditorProps {
   onReady?(editor: TiptapEditor): void;
   /** Tên vùng soạn cho trình đọc màn hình (mặc định labels.editorLabel). */
   ariaLabel?: string;
+  /** Cho chèn khối động (tên website, menu, danh sách bài…) — Trình dựng, trang dựng bằng khối. Nội dung có sẵn khối động luôn mở được. */
+  dynamicBlocks?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -307,7 +310,7 @@ function Stats({ editor, t }: { editor: TiptapEditor; t: EditorLabels }) {
 /** Trình soạn nội dung. Dùng kèm CSS: import "@cms/editor/style.css". */
 const NO_PACKS: EditorExtensionPack[] = [];
 
-export function Editor({ initial, onChange, media, labels, extensions: localPacks = NO_PACKS, toolbarClassName, className, onReady, ariaLabel }: EditorProps) {
+export function Editor({ initial, onChange, media, labels, extensions: localPacks = NO_PACKS, toolbarClassName, className, onReady, ariaLabel, dynamicBlocks = false }: EditorProps) {
   const t = useMemo(() => ({ ...viLabels, ...labels }), [labels]);
   const slash = useMemo(createSlashStore, []);
   const globalPacks = useSyncExternalStore(onExtensionsChange, registeredExtensions);
@@ -338,7 +341,8 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
       case "file": c.insertContent({ type: "file", attrs: { src: m.url, name: m.title || m.fileName, mime: m.mimeType, mediaId: m.id, size: m.size } }).run(); break;
     }
   };
-  const items = useMemo(() => [...defaultItems(t, requestMedia), ...packs.flatMap((p) => p.insertItems ?? [])], [t, packs]);
+  const items = useMemo(() => [...defaultItems(t, requestMedia), ...packs.flatMap((p) => p.insertItems ?? [])]
+    .filter((i) => dynamicBlocks || !(i.key.startsWith("block:") && DYNAMIC_BLOCKS.has(i.key.slice(6)))), [t, packs, dynamicBlocks]);
   const itemsRef = useRef(items); itemsRef.current = items;
 
   const editor = useEditor({

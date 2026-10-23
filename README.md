@@ -42,6 +42,16 @@ const { main, others } = contentToEditor(saved);
 
 Không truyền `media` → chèn ảnh/video bằng URL.
 
+## Khối động (1.7)
+
+```tsx
+import { registerDynamicBlocks } from "@cms/editor";
+registerDynamicBlocks("vi");                // một lần; node của khối động (@cms/content DYNAMIC_NODES) có mặt ở mọi trình soạn
+<Editor dynamicBlocks … />                  // chỉ trình soạn này cho chèn (nhóm "Giao diện" trong trình chèn và slash menu)
+```
+
+Mỗi khối hiện thành khung có tên + dòng tóm tắt (vị trí menu, phần dùng chung, nguồn danh sách bài); cài đặt sinh từ thuộc tính. `query` chèn vào có sẵn `postTemplate` (tiêu đề + sapo) và `pagination`. `registerBlock` có thêm `initialContent` cho khối chứa khối khác.
+
 ## Đổi màu
 
 ```css

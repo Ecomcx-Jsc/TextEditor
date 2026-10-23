@@ -8,6 +8,7 @@ import { blockFromPos, currentBlock, insertParagraphAfter } from "./blockops";
 import { viLabels, type EditorLabels } from "./labels";
 import { labelsOf } from "./nodes";
 import type { InsertItem } from "./types";
+import { DYNAMIC_NODES } from "@cms/content";
 import { rankItems } from "./rank";
 import { cx } from "./util";
 
@@ -20,6 +21,7 @@ const GROUPS: Array<[keyof EditorLabels, string[]]> = [
   ["groupDesign", ["columns2", "columns3", "group", "callout", "button", "hr"]],
   ["groupEmbed", ["youtube", "embed"]],
   ["groupWidgets", ["shortcode"]],
+  ["groupTheme", [...DYNAMIC_NODES].map((n) => `block:${n}`)],
 ];
 
 const itemsOf = (editor: TiptapEditor): InsertItem[] => (editor.storage as any).cmsEditorContext?.items ?? [];

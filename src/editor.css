@@ -69,6 +69,9 @@
 .cms-ed-content .ProseMirror-selectednode img, .cms-ed-content img.ProseMirror-selectednode { outline: 2px solid var(--cms-ed-accent); outline-offset: 2px; }
 .cms-ed-content [data-node="image"] { margin: .5em 0; }
 
+/* Khối động: dòng tóm tắt cạnh tên khối */
+.cms-ed-dynamic-summary { margin: -2px 0 4px; font-size: 12px; color: var(--cms-ed-muted); }
+
 /* Khối media (gallery, video, âm thanh, tệp) */
 .cms-ed-block { margin: 1rem 0; padding: 8px; border: 1px solid var(--cms-ed-line); border-radius: 10px; background: var(--cms-ed-hover); }
 .cms-ed-block.is-selected { border-color: var(--cms-ed-accent); box-shadow: 0 0 0 3px var(--cms-ed-accent-soft); }

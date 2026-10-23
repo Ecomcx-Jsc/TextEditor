@@ -24,6 +24,8 @@ export interface RegisterBlockOptions {
   edit?: ComponentType<BlockEditProps>;
   /** Dịch nhãn ("%khoá%" → chữ theo ngôn ngữ admin) — admin truyền vào. */
   translate?(text: string): string;
+  /** Khối chứa khối khác: nội dung có sẵn khi chèn (mặc định một đoạn văn trống). */
+  initialContent?(): Array<Record<string, unknown>>;
 }
 
 const blocks = new Map<string, BlockDefinition>();
@@ -160,7 +162,7 @@ export function registerBlock(def: BlockDefinition, opts: RegisterBlockOptions =
       run: (editor, range) => {
         if (range) editor.chain().focus().deleteRange(range).run();
         const node: Record<string, unknown> = { type: def.name, attrs: blockDefaults(def) };
-        if (def.content === "blocks") node.content = [{ type: "paragraph" }];
+        if (def.content === "blocks") node.content = opts.initialContent?.() ?? [{ type: "paragraph" }];
         insertBlock(editor, node);
       },
     }],
