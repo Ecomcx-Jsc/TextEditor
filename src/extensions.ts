@@ -1,4 +1,6 @@
 import { getSchema, type AnyExtension } from "@tiptap/core";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import Youtube from "@tiptap/extension-youtube";
@@ -30,6 +32,26 @@ export function coreExtensions(): AnyExtension[] {
       addAttributes() {
         const flag = (name: string) => ({ default: false, parseHTML: (el: HTMLElement) => el.hasAttribute(`data-${name}`), renderHTML: (a: Record<string, unknown>) => (a[name] ? { [`data-${name}`]: "" } : {}) });
         return { ...this.parent?.(), footer: flag("footer"), fixed: flag("fixed") };
+      },
+      // Bảng dùng node view riêng (không nhận thuộc tính HTML) → gắn data-footer / data-fixed lên khung bảng bằng decoration
+      addProseMirrorPlugins() {
+        return [...(this.parent?.() ?? []), new Plugin({
+          key: new PluginKey("cmsTableFlags"),
+          props: {
+            decorations: (state) => {
+              const decos: Decoration[] = [];
+              state.doc.descendants((node, pos) => {
+                if (node.type.name !== "table") return;
+                const attrs: Record<string, string> = {};
+                if (node.attrs.footer) attrs["data-footer"] = "";
+                if (node.attrs.fixed) attrs["data-fixed"] = "";
+                if (Object.keys(attrs).length) decos.push(Decoration.node(pos, pos + node.nodeSize, attrs));
+                return false;
+              });
+              return DecorationSet.create(state.doc, decos);
+            },
+          },
+        })];
       },
     }).configure({ resizable: false }),
     TaskList, TaskItem.configure({ nested: true }),

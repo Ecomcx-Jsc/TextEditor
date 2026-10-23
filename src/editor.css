@@ -322,5 +322,5 @@
 .cms-ed-pattern-title { font-size: 12px; font-weight: 600; }
 
 /* Bảng: chân bảng, cố định độ rộng cột */
-.cms-ed-content table[data-footer] tr:last-child > td { font-weight: 600; background: var(--cms-ed-hover); }
-.cms-ed-content table[data-fixed] { table-layout: fixed; }
+.cms-ed-content :is(table[data-footer], [data-footer] table) tr:last-child > td { font-weight: 600; background: var(--cms-ed-hover); }
+.cms-ed-content :is(table[data-fixed], [data-fixed] table) { table-layout: fixed; }

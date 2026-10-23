@@ -44,6 +44,8 @@ Không truyền `media` → chèn ảnh/video bằng URL.
 
 ## Bảng, mạng xã hội (1.13)
 
+Ứng dụng dùng Vite và tiền xử lý TipTap lồng trong gói (`optimizeDeps.include: ["@cms/editor > @tiptap/pm/state", …]`) cần có cả `pm/view` (trình soạn tạo decoration).
+
 Bảng có `footer` (hàng cuối là chân bảng — `<tfoot>` trên website) và `fixed` (cố định độ rộng cột): nút "Hàng chân bảng" trên thanh công cụ khối, ô tích trong tab Khối. Khối mạng xã hội có `showLabels` (website hiện biểu tượng SVG, bật để kèm tên).
 
 ## Mẫu (1.12)
