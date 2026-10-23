@@ -3,7 +3,7 @@ import { useEditorState } from "@tiptap/react";
 import { NodeSelection } from "@tiptap/pm/state";
 import { AlignCenter, AlignJustify, AlignLeft, AlignRight, ArrowDown, ArrowUp, ChevronRight, Copy, Trash2 } from "lucide-react";
 import { Component, useEffect, useId, useState, useSyncExternalStore, type ReactNode } from "react";
-import type { Device } from "@cms/content";
+import { CORE_BLOCK_STYLES, normalizeAnchor, normalizeClassName, type Device, type StylePresets } from "@cms/content";
 import { StylePanel } from "./stylepanel";
 import { blockPanels, onBlockPanelsChange } from "./panels";
 import { BlockAttributesForm, pluginBlockInfo } from "./blocks";
@@ -20,10 +20,14 @@ import { cx } from "./util";
  * thao tác lên / xuống / nhân bản / xoá. Khi đang hiện, form cài đặt trong khối plugin và thanh cài đặt nổi được ẩn (tránh lặp).
  * Ứng dụng đặt component này ở thanh bên, truyền đối tượng TipTap nhận từ `onReady` của Editor.
  */
-export function BlockInspector({ editor, labels, device: deviceProp, onDeviceChange }: {
+export function BlockInspector({ editor, labels, device: deviceProp, onDeviceChange, presets, blockStyles }: {
   editor: TiptapEditor; labels?: Partial<EditorLabels>;
   /** Khổ màn hình đang sửa trong tab Kiểu dáng — ứng dụng truyền vào để đồng bộ với khung xem trực tiếp. */
   device?: Device; onDeviceChange?(d: Device): void;
+  /** Preset kiểu dáng của theme (tab Kiểu dáng dùng thay danh sách mặc định). */
+  presets?: StylePresets;
+  /** Biến thể kiểu của theme theo loại khối (theme.json › blockStyles, nhãn đã dịch) — thêm vào biến thể có sẵn của lõi. */
+  blockStyles?: Record<string, Array<{ name: string; label: string }>>;
 }) {
   const t = { ...viLabels, ...labelsOf(editor), ...labels };
   const panels = useSyncExternalStore(onBlockPanelsChange, blockPanels);
@@ -90,13 +94,17 @@ export function BlockInspector({ editor, labels, device: deviceProp, onDeviceCha
       </div>
       {tab === "style" ? (
         <div className="cms-ed-inspector-body" role="tabpanel">
-          <StylePanel style={block.node.attrs.style} t={t} device={device} onDeviceChange={changeDevice}
+          <StylePanel style={block.node.attrs.style} t={t} device={device} onDeviceChange={changeDevice} presets={presets}
+            variants={[...(CORE_BLOCK_STYLES[block.node.type.name] ?? []).map((name) => ({ name, label: (t as Record<string, string>)[`variant_${name}`] ?? name })),
+              ...(blockStyles?.[block.node.type.name] ?? [])]}
+            variant={block.node.attrs.blockStyle} onVariantChange={(v) => { const tr = setBlockAttrs(editor.state, block.pos, { blockStyle: v }); if (tr) editor.view.dispatch(tr); }}
             onChange={(style) => { const tr = setBlockAttrs(editor.state, block.pos, { style }); if (tr) editor.view.dispatch(tr); }} />
         </div>
       ) : <>
       <div className="cms-ed-inspector-body" role="tabpanel">
         <Settings editor={editor} block={block} t={t} />
       </div>
+      <Advanced key={block.pos} attrs={block.node.attrs} t={t} set={(a) => { const tr = setBlockAttrs(editor.state, block.pos, a); if (tr) editor.view.dispatch(tr); }} />
       {panels.filter((p) => !p.blocks || p.blocks.includes(block.node.type.name)).map((p) => (
         <section key={p.id} className="cms-ed-inspector-panel" aria-label={p.title}>
           <h4>{p.title}</h4>
@@ -114,6 +122,28 @@ export function BlockInspector({ editor, labels, device: deviceProp, onDeviceCha
         <button type="button" className="is-danger" onClick={() => runBlockAction(editor, "delete", block)}><Trash2 size={14} /> {t.deleteBlock}</button>
       </div>
     </div>
+  );
+}
+
+/** Nâng cao: neo HTML (id) và class CSS riêng — lưu khi rời ô, giá trị sai báo đỏ. */
+function Advanced({ attrs, t, set }: { attrs: Record<string, any>; t: EditorLabels; set(a: Record<string, unknown>): void }) {
+  const [anchor, setAnchor] = useState(attrs.anchor ?? "");
+  const [cls, setCls] = useState(attrs.className ?? "");
+  const anchorBad = anchor.trim() !== "" && !normalizeAnchor(anchor);
+  return (
+    <details className="cms-ed-inspector-panel cms-ed-advanced">
+      <summary>{t.advanced}</summary>
+      <Field label={t.anchor}>{(id) => <>
+        <input id={id} value={anchor} aria-invalid={anchorBad || undefined} className={cx(anchorBad && "is-invalid")} placeholder="bang-gia"
+          onChange={(e) => setAnchor(e.target.value)} onBlur={() => { if (!anchorBad) set({ anchor: normalizeAnchor(anchor) ?? null }); }} />
+        <small>{t.anchorHint}</small>
+      </>}</Field>
+      <Field label={t.cssClass}>{(id) => <>
+        <input id={id} value={cls} placeholder="hero highlight" onChange={(e) => setCls(e.target.value)}
+          onBlur={() => { const v = normalizeClassName(cls) ?? null; setCls(v ?? ""); set({ className: v }); }} />
+        <small>{t.cssClassHint}</small>
+      </>}</Field>
+    </details>
   );
 }
 

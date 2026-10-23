@@ -42,6 +42,10 @@ const { main, others } = contentToEditor(saved);
 
 Không truyền `media` → chèn ảnh/video bằng URL.
 
+## Biến thể, neo, class, preset (1.11)
+
+Mọi khối có thuộc tính `blockStyle` (class `ecx-is-…`), `anchor` (id), `className`. `BlockInspector` nhận `presets` (preset của theme — bảng màu, cỡ chữ, khoảng cách, phông trong tab Kiểu dáng) và `blockStyles` (biến thể của theme theo loại khối; cộng với biến thể có sẵn `CORE_BLOCK_STYLES`); tab Cài đặt có mục Nâng cao (neo HTML, class CSS riêng). `<Editor presets>` áp biến `--ecx-*` vào vùng soạn — cùng giá trị với website.
+
 ## Bộ khối cơ bản (1.10)
 
 Có sẵn ở mọi trình soạn (`registerBasicBlocks("en")` để đổi nhãn): mục lục, ảnh bìa (ảnh nền + lớp phủ + nội dung), ảnh + chữ, nhóm nút, khoảng trống, trích dẫn nổi bật, chi tiết (thu gọn), HTML tuỳ chỉnh (trình soạn chỉ hiện mã nguồn, không chạy), mạng xã hội (sửa link ngay trong khối), văn bản định dạng sẵn (giữ khoảng trắng, Enter xuống dòng trong khối). Chèn bảng hỏi số cột × số hàng. Form cài đặt khối có điều khiển `media` (chọn ảnh từ nguồn media của Editor). Slash menu nhận nhiều từ ("/dinh dang").

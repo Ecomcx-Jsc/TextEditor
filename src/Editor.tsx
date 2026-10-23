@@ -24,7 +24,8 @@ import { AskPopover, askOf, createAskStore, type Ask } from "./ask";
 import { BlockHandle, BlockKeys } from "./handle";
 import { BlockSettingsBar, layoutItems } from "./layoutUi";
 import { BlockToolbar } from "./toolbar";
-import { documentStyleCss } from "./styleattr";
+import { documentStyleCss, presetsCss } from "./styleattr";
+import type { StylePresets } from "@cms/content";
 import { registerBasicBlocks } from "./basic";
 import { setImagePicker } from "./blocks";
 
@@ -53,6 +54,8 @@ export interface EditorProps {
   ariaLabel?: string;
   /** Cho chèn khối động (tên website, menu, danh sách bài…) — Trình dựng, trang dựng bằng khối. Nội dung có sẵn khối động luôn mở được. */
   dynamicBlocks?: boolean;
+  /** Preset kiểu dáng của theme (màu, cỡ chữ, khoảng cách, phông) — vùng soạn dùng cùng biến CSS với website. */
+  presets?: StylePresets;
 }
 
 // ---------------------------------------------------------------------------
@@ -277,8 +280,8 @@ function SelectionMenu({ editor, t }: { editor: TiptapEditor; t: EditorLabels })
 }
 
 /** CSS kiểu dáng khối (attrs.style) của bài — cùng CSS với website. */
-function DocumentStyles({ editor }: { editor: TiptapEditor }) {
-  const css = useEditorState({ editor, selector: ({ editor: e }) => documentStyleCss(e) });
+function DocumentStyles({ editor, presets }: { editor: TiptapEditor; presets?: StylePresets }) {
+  const css = presetsCss(presets) + useEditorState({ editor, selector: ({ editor: e }) => documentStyleCss(e) });
   return css ? <style data-ecx-styles="">{css}</style> : null;
 }
 
@@ -303,7 +306,7 @@ function Stats({ editor, t }: { editor: TiptapEditor; t: EditorLabels }) {
 /** Trình soạn nội dung. Dùng kèm CSS: import "@cms/editor/style.css". */
 const NO_PACKS: EditorExtensionPack[] = [];
 
-export function Editor({ initial, onChange, media, labels, extensions: localPacks = NO_PACKS, toolbarClassName, className, onReady, ariaLabel, dynamicBlocks = false }: EditorProps) {
+export function Editor({ initial, onChange, media, labels, extensions: localPacks = NO_PACKS, toolbarClassName, className, onReady, ariaLabel, dynamicBlocks = false, presets }: EditorProps) {
   const t = useMemo(() => ({ ...viLabels, ...labels }), [labels]);
   const slash = useMemo(createSlashStore, []);
   const globalPacks = useSyncExternalStore(onExtensionsChange, registeredExtensions);
@@ -399,7 +402,7 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
     <div className={cx("cms-editor", className)}>
       {editor && <div className={cx("cms-ed-toolbar", toolbarClassName)}><Toolbar editor={editor} t={t} requestMedia={requestMedia} items={items} /></div>}
       {editor && <SelectionMenu editor={editor} t={t} />}
-      {editor && <DocumentStyles editor={editor} />}
+      {editor && <DocumentStyles editor={editor} presets={presets} />}
       <EditorContent editor={editor} />
       <SlashMenu store={slash} t={t} />
       {editor && <BlockHandle editor={editor} t={t} menuRequest={menuRequest} />}

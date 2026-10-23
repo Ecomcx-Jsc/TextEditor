@@ -1,4 +1,4 @@
-import { normalizeStyle, type BlockStyle, type Device } from "@cms/content";
+import { normalizeStyle, type BlockStyle, type Device, type StylePresets } from "@cms/content";
 import { Link2, Link2Off, Monitor, MoreVertical, Smartphone, Tablet } from "lucide-react";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import type { EditorLabels } from "./labels";
@@ -55,11 +55,11 @@ function Seg<T extends string>({ value, options, onChange, label }: { value: T |
 }
 
 /** Ô màu: preset của theme (ô vuông) + bảng chọn màu + bỏ màu. */
-function ColorField({ value, onChange, label, t }: { value?: string; onChange(v: string | undefined): void; label: string; t: EditorLabels }) {
+function ColorField({ value, onChange, label, t, colors = COLORS }: { value?: string; onChange(v: string | undefined): void; label: string; t: EditorLabels; colors?: string[] }) {
   const hex = value && /^#[0-9a-f]{6}$/i.test(value) ? value : "#000000";
   return (
     <div className="cms-ed-color" role="group" aria-label={label}>
-      {COLORS.map((c) => (
+      {colors.map((c) => (
         <button key={c} type="button" title={c} aria-label={`${label}: ${c}`} aria-pressed={value === c} className={cx("cms-ed-swatch", value === c && "is-active")}
           style={{ background: `var(--ecx-color-${c})` }} onClick={() => onChange(value === c ? undefined : c)} />
       ))}
@@ -70,7 +70,7 @@ function ColorField({ value, onChange, label, t }: { value?: string; onChange(v:
 }
 
 /** Bốn cạnh (trên, phải, dưới, trái) — khoá liên kết thì một giá trị cho cả bốn. */
-function BoxField({ value, onChange, label, t }: { value: string | Record<string, string> | undefined; onChange(v: string | Record<string, string> | undefined): void; label: string; t: EditorLabels }) {
+function BoxField({ value, onChange, label, t, spaces = SPACES }: { value: string | Record<string, string> | undefined; onChange(v: string | Record<string, string> | undefined): void; label: string; t: EditorLabels; spaces?: string[] }) {
   const [linked, setLinked] = useState(typeof value !== "object" || value === null);
   const ok = (v: string) => !!normalizeStyle({ padding: v });
   const sides = typeof value === "object" && value ? value : value ? { top: value, right: value, bottom: value, left: value } : {};
@@ -84,7 +84,7 @@ function BoxField({ value, onChange, label, t }: { value: string | Record<string
       <div className="cms-ed-box-head">
         <span>{label}</span>
         <span role="group" aria-label={label} className="cms-ed-seg is-compact">
-          {SPACES.map((v) => (
+          {spaces.map((v) => (
             <button key={v} type="button" title={v} aria-pressed={linked && value === v} className={cx("cms-ed-seg-btn", linked && value === v && "is-active")}
               onClick={() => { setLinked(true); onChange(value === v ? undefined : v); }}>{v === "0" ? "0" : v.toUpperCase()}</button>
           ))}
@@ -143,9 +143,17 @@ function Panel({ title, section, t, visible, setVisible, onReset, children }: {
  * Tab "Kiểu dáng" của khối: kiểu chữ, màu, khoảng cách, viền, ẩn theo khổ màn hình — ghi vào `attrs.style` (@cms/content).
  * Giá trị theo khổ (khoảng cách, cỡ chữ…) sửa theo khổ đang chọn; khổ nhỏ chưa đặt thì kế thừa khổ lớn hơn.
  */
-export function StylePanel({ style: raw, onChange, t, device, onDeviceChange }: {
+export function StylePanel({ style: raw, onChange, t, device, onDeviceChange, presets, variants, variant, onVariantChange }: {
   style: unknown; onChange(style: BlockStyle | null): void; t: EditorLabels; device: Device; onDeviceChange(d: Device): void;
+  /** Preset của theme: màu, cỡ chữ, khoảng cách, phông — thay cho danh sách mặc định. */
+  presets?: StylePresets;
+  /** Biến thể của loại khối này (lõi + theme). */
+  variants?: Array<{ name: string; label: string }>; variant?: string | null; onVariantChange?(v: string | null): void;
 }) {
+  const colors = presets?.colors ? Object.keys(presets.colors) : COLORS;
+  const sizes: Array<[string, string]> = presets?.fontSizes ? Object.keys(presets.fontSizes).map((k) => [k, k.toUpperCase()]) : SIZES;
+  const spaces = presets?.spacing ? ["0", ...Object.keys(presets.spacing)] : SPACES;
+  const fonts = presets?.fonts ? Object.keys(presets.fonts) : ["body", "heading", "mono"];
   const style: Style = (normalizeStyle(raw) ?? {}) as Style;
   const [visible, setVisibleState] = useState<Record<string, boolean>>(loadVisible);
   const setVisible = (k: string, v: boolean) => {
@@ -188,15 +196,28 @@ export function StylePanel({ style: raw, onChange, t, device, onDeviceChange }: 
         </span>
       </div>
 
+      {variants && variants.length > 0 && (
+        <div className="cms-ed-ifield cms-ed-variants">
+          <span>{t.blockVariant}</span>
+          <span role="group" aria-label={t.blockVariant} className="cms-ed-seg">
+            {[{ name: "", label: t.variant_default }, ...variants].map((v) => (
+              <button key={v.name || "default"} type="button" aria-pressed={(variant ?? "") === v.name} className={cx("cms-ed-seg-btn", (variant ?? "") === v.name && "is-active")}
+                onClick={() => onVariantChange?.(v.name || null)}>{v.label}</button>
+            ))}
+          </span>
+        </div>
+      )}
+
       <Panel title={t.style_typography} section="typography" t={t} visible={visible} setVisible={setVisible}
         onReset={() => reset(["fontFamily", "fontSize", "lineHeight", "letterSpacing", "fontWeight", "fontStyle", "textDecoration", "textTransform", "textAlign"])}>
         {shows("typography", "fontFamily") && row("fontFamily", t.style_fontFamily,
           <select value={style.fontFamily ?? ""} aria-label={t.style_fontFamily} onChange={(e) => set("fontFamily", e.target.value || undefined)}>
-            <option value="">{t.default}</option><option value="body">{t.font_body}</option><option value="heading">{t.font_heading}</option><option value="mono">{t.font_mono}</option>
+            <option value="">{t.default}</option>
+            {fonts.map((f) => <option key={f} value={f}>{(t as Record<string, string>)[`font_${f}`] ?? f}</option>)}
           </select>)}
         {shows("typography", "fontSize") && row("fontSize", t.style_fontSize, <>
-          <Seg label={t.style_fontSize} value={get("fontSize")} onChange={(v) => set("fontSize", v)} options={SIZES.map(([v, l]) => [v, l, v] as [string, ReactNode, string])} />
-          <ValueInput label={`${t.style_fontSize}: ${t.custom}`} value={SIZES.some(([v]) => v === get("fontSize")) ? undefined : get("fontSize")} check={ok("fontSize")} placeholder="18px, 1.25rem" onCommit={(v) => set("fontSize", v)} />
+          <Seg label={t.style_fontSize} value={get("fontSize")} onChange={(v) => set("fontSize", v)} options={sizes.map(([v, l]) => [v, l, v] as [string, ReactNode, string])} />
+          <ValueInput label={`${t.style_fontSize}: ${t.custom}`} value={sizes.some(([v]) => v === get("fontSize")) ? undefined : get("fontSize")} check={ok("fontSize")} placeholder="18px, 1.25rem" onCommit={(v) => set("fontSize", v)} />
         </>)}
         {shows("typography", "appearance") && row("appearance", t.style_appearance,
           <select value={appearance} aria-label={t.style_appearance} onChange={(e) => {
@@ -222,13 +243,13 @@ export function StylePanel({ style: raw, onChange, t, device, onDeviceChange }: 
       </Panel>
 
       <Panel title={t.style_color} section="color" t={t} visible={visible} setVisible={setVisible} onReset={() => reset(["color"])}>
-        {shows("color", "text") && row("text", t.style_text, <ColorField label={t.style_text} t={t} value={style.color?.text} onChange={(v) => setGroup("color", "text", v)} />)}
-        {shows("color", "background") && row("background", t.style_background, <ColorField label={t.style_background} t={t} value={style.color?.background} onChange={(v) => setGroup("color", "background", v)} />)}
+        {shows("color", "text") && row("text", t.style_text, <ColorField colors={colors} label={t.style_text} t={t} value={style.color?.text} onChange={(v) => setGroup("color", "text", v)} />)}
+        {shows("color", "background") && row("background", t.style_background, <ColorField colors={colors} label={t.style_background} t={t} value={style.color?.background} onChange={(v) => setGroup("color", "background", v)} />)}
       </Panel>
 
       <Panel title={t.style_spacing} section="spacing" t={t} visible={visible} setVisible={setVisible} onReset={() => reset(["padding", "margin", "gap", "width", "maxWidth", "minHeight"])}>
-        {shows("spacing", "padding") && <div className="cms-ed-ifield"><BoxField label={`${t.style_padding}${device !== "base" ? ` · ${t[`device_${device}`]}` : ""}`} t={t} value={get("padding")} onChange={(v) => set("padding", v)} />{deviceMark("padding")}</div>}
-        {shows("spacing", "margin") && <div className="cms-ed-ifield"><BoxField label={`${t.style_margin}${device !== "base" ? ` · ${t[`device_${device}`]}` : ""}`} t={t} value={get("margin")} onChange={(v) => set("margin", v)} />{deviceMark("margin")}</div>}
+        {shows("spacing", "padding") && <div className="cms-ed-ifield"><BoxField spaces={spaces} label={`${t.style_padding}${device !== "base" ? ` · ${t[`device_${device}`]}` : ""}`} t={t} value={get("padding")} onChange={(v) => set("padding", v)} />{deviceMark("padding")}</div>}
+        {shows("spacing", "margin") && <div className="cms-ed-ifield"><BoxField spaces={spaces} label={`${t.style_margin}${device !== "base" ? ` · ${t[`device_${device}`]}` : ""}`} t={t} value={get("margin")} onChange={(v) => set("margin", v)} />{deviceMark("margin")}</div>}
         {(["gap", "width", "maxWidth", "minHeight"] as const).filter((k) => shows("spacing", k)).map((k) =>
           row(k, t[`style_${k}`], <ValueInput label={t[`style_${k}`]} value={get(k)} check={ok(k)} placeholder={k === "gap" ? "md, 24px" : "100%, 640px, 60vh"} onCommit={(v) => set(k, v)} />))}
       </Panel>
@@ -238,7 +259,7 @@ export function StylePanel({ style: raw, onChange, t, device, onDeviceChange }: 
           {row("borderWidth", t.style_borderWidth, <ValueInput label={t.style_borderWidth} value={style.border?.width} check={ok("radius")} placeholder="1px" onCommit={(v) => setGroup("border", "width", v ?? undefined)} />)}
           {row("borderStyle", t.style_borderStyle, <Seg label={t.style_borderStyle} value={style.border?.style} onChange={(v) => setGroup("border", "style", v)}
             options={[["solid", "—", t.border_solid], ["dashed", "- -", t.border_dashed], ["dotted", "···", t.border_dotted]]} />)}
-          {row("borderColor", t.style_borderColor, <ColorField label={t.style_borderColor} t={t} value={style.border?.color} onChange={(v) => setGroup("border", "color", v)} />)}
+          {row("borderColor", t.style_borderColor, <ColorField colors={colors} label={t.style_borderColor} t={t} value={style.border?.color} onChange={(v) => setGroup("border", "color", v)} />)}
         </>}
         {shows("border", "radius") && row("radius", t.style_radius, <ValueInput label={t.style_radius} value={style.radius} check={ok("radius")} placeholder="8px" onCommit={(v) => set("radius", v ?? undefined)} />)}
       </Panel>

@@ -304,3 +304,10 @@
 .cms-ed-media-field { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .cms-ed-media-field img { width: 56px; height: 40px; object-fit: cover; border-radius: 4px; }
 .cms-ed-social > .cms-ed-text-btn { display: inline-flex; align-items: center; gap: 4px; justify-self: start; }
+
+/* Nâng cao (neo, class) + biến thể */
+.cms-ed-advanced > summary { cursor: pointer; font-size: 12px; font-weight: 600; color: var(--cms-ed-fg); }
+.cms-ed-advanced[open] > summary { margin-bottom: 8px; }
+.cms-ed-advanced small { font-size: 11px; color: var(--cms-ed-muted); }
+.cms-ed-advanced input.is-invalid { border-color: var(--cms-ed-danger); }
+.cms-ed-variants .cms-ed-seg { flex-wrap: wrap; }
