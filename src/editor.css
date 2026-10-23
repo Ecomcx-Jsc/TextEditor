@@ -5,7 +5,7 @@
  *   --cms-ed-bg, --cms-ed-panel, --cms-ed-fg, --cms-ed-muted, --cms-ed-faint, --cms-ed-line, --cms-ed-hover,
  *   --cms-ed-accent, --cms-ed-accent-soft, --cms-ed-accent-fg, --cms-ed-danger, --cms-ed-code-bg, --cms-ed-font
  */
-:where(.cms-editor, .cms-ed-slash, .cms-ed-bubble, .cms-ed-ask, .cms-ed-handle, .cms-ed-bar, .cms-ed-inspector, .cms-ed-inserter, .cms-ed-outline) {
+:where(.cms-editor, .cms-ed-slash, .cms-ed-bubble, .cms-ed-ask, .cms-ed-handle, .cms-ed-bar, .cms-ed-blockbar, .cms-ed-inspector, .cms-ed-inserter, .cms-ed-outline) {
   /* :where → độ ưu tiên 0: ứng dụng nhúng ghi đè được dù CSS này nạp sau */
   --cms-ed-panel: #fff; --cms-ed-fg: #18181b; --cms-ed-muted: #71717a; --cms-ed-faint: #a1a1aa; --cms-ed-line: #e4e4e7;
   --cms-ed-hover: #f4f4f5; --cms-ed-accent: #4f46e5; --cms-ed-accent-soft: #eef2ff; --cms-ed-accent-fg: #fff; --cms-ed-danger: #dc2626;
@@ -71,7 +71,7 @@
 
 /* Thanh công cụ nổi phía trên khối */
 .cms-ed-blockbar { position: fixed; z-index: 45; display: flex; align-items: center; gap: 2px; padding: 3px; border: 1px solid var(--cms-ed-fg, #18181b);
-  border-radius: 8px; background: var(--cms-ed-panel); color: var(--cms-ed-fg); box-shadow: 0 4px 16px rgb(0 0 0 / .08); font-size: 13px; }
+  border-radius: 8px; background: var(--cms-ed-panel, #fff); color: var(--cms-ed-fg, #18181b); box-shadow: 0 4px 16px rgb(0 0 0 / .12); font-size: 13px; }
 .cms-ed-blockbar-group { display: inline-flex; align-items: center; gap: 2px; }
 .cms-ed-blockbar-type { display: inline-flex; width: 28px; justify-content: center; color: var(--cms-ed-muted); }
 .cms-ed-blockbar .cms-ed-btn.is-wide { width: auto; padding: 0 4px; gap: 1px; }
