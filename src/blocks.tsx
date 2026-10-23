@@ -28,6 +28,10 @@ export interface RegisterBlockOptions {
   initialContent?(): Array<Record<string, unknown>>;
 }
 
+/** Chọn một ảnh (điều khiển "media" trong form cài đặt) — Editor đặt bằng nguồn media của ứng dụng. */
+let imagePicker: (() => Promise<{ url: string; id?: unknown; alt?: string } | null>) | null = null;
+export function setImagePicker(fn: typeof imagePicker) { imagePicker = fn; }
+
 const blocks = new Map<string, BlockDefinition>();
 const options = new Map<string, RegisterBlockOptions>();
 
@@ -74,7 +78,16 @@ function Settings({ def, attrs, setAttrs, t, stacked }: { def: BlockDefinition; 
         return (
           <label key={key} htmlFor={id} className={cx("cms-ed-field", control === "checkbox" && "is-check")}>
             {control !== "checkbox" && <span>{label}</span>}
-            {control === "select" ? (
+            {control === "media" ? (
+              <span className="cms-ed-media-field">
+                {value ? <img src={String(value)} alt="" /> : null}
+                <button type="button" id={id} className="cms-ed-text-btn" onClick={async () => {
+                  const m = await imagePicker?.();
+                  if (m) setAttrs({ [key]: m.url, ...(key === "src" ? { mediaId: m.id ?? null, ...(attrs.alt ? {} : { alt: m.alt || null }) } : {}) });
+                }}>{t(value ? "replaceImage" : "pickImage")}</button>
+                {value ? <button type="button" className="cms-ed-text-btn" onClick={() => setAttrs({ [key]: null, ...(key === "src" ? { mediaId: null } : {}) })}>{t("removeImage")}</button> : null}
+              </span>
+            ) : control === "select" ? (
               <select id={id} value={String(value)} onChange={(e) => set(e.target.value)}>
                 {(spec.enum ?? []).map((v, i) => <option key={String(v)} value={String(v)}>{t(spec.enumLabels?.[i] ?? String(v))}</option>)}
               </select>

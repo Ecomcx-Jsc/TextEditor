@@ -16,6 +16,9 @@ import { registeredExtensions } from "../src/registry";
 const fixturesDir = path.join(path.dirname(createRequire(import.meta.url).resolve("@cms/content/package.json")), "fixtures");
 const fixtures = readdirSync(fixturesDir).filter((f) => f.endsWith(".json")).map((f) => JSON.parse(readFileSync(path.join(fixturesDir, f), "utf8")));
 
+import { registerBasicBlocks } from "../src/basic";
+registerBasicBlocks();
+
 function roundTrip(content: unknown) {
   const extra = registeredExtensions().flatMap((p) => p.extensions ?? []);
   const schema = getSchema([...coreExtensions(), ...extra]);
@@ -65,7 +68,7 @@ const badge = defineBlock({ name: "demo/badge", title: "Nhãn", version: 2, attr
 test("khối defineBlock: node sinh tự động, lưu đúng thuộc tính, nâng phiên bản khi mở bài cũ", () => {
   registerBlock(callout); registerBlock(badge);
   try {
-    assert.equal(registeredBlocks().length, 2);
+    assert.ok(["demo/callout", "demo/badge"].every((n) => registeredBlocks().some((b) => b.name === n)));
     const content = { type: "doc", content: [
       { type: "demo/callout", attrs: { tone: "warning" }, content: [{ type: "paragraph", content: [{ type: "text", text: "Chú ý" }] }] },
       { type: "demo/badge", attrs: { color: "red" } }] };

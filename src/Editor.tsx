@@ -25,6 +25,11 @@ import { BlockHandle, BlockKeys } from "./handle";
 import { BlockSettingsBar, layoutItems } from "./layoutUi";
 import { BlockToolbar } from "./toolbar";
 import { documentStyleCss } from "./styleattr";
+import { registerBasicBlocks } from "./basic";
+import { setImagePicker } from "./blocks";
+
+// Bộ khối cơ bản có sẵn ở mọi trình soạn (ứng dụng gọi lại registerBasicBlocks("en") để đổi nhãn)
+registerBasicBlocks();
 import { cleanPastedHtml, isUrl } from "./paste";
 import { handleInsertDrop } from "./inserter";
 import { embedInfo } from "@cms/content";
@@ -72,7 +77,7 @@ function defaultItems(t: EditorLabels, requestMedia: RequestMedia): InsertItem[]
     { key: "video", title: t.video, hint: t.videoHint, icon: Video, keywords: "video mp4 phim", run: (e, r) => { chain(e, r).run(); requestMedia(e, "video"); } },
     { key: "audio", title: t.audio, hint: t.audioHint, icon: Music, keywords: "am thanh audio nhac mp3 podcast", run: (e, r) => { chain(e, r).run(); requestMedia(e, "audio"); } },
     { key: "file", title: t.file, hint: t.fileHint, icon: FileText, keywords: "tep file pdf tai xuong download tai lieu", run: (e, r) => { chain(e, r).run(); requestMedia(e, "file"); } },
-    { key: "table", title: t.table, hint: "3 × 3", icon: Table2, keywords: "bang table", run: (e, r) => chain(e, r).insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run() },
+    { key: "table", title: t.table, hint: t.tableHint, icon: Table2, keywords: "bang table", run: (e, r) => { chain(e, r).run(); insertTableAsk(e, t); } },
     { key: "youtube", title: t.youtube, hint: t.youtubeHint, icon: Video, keywords: "video youtube", run: async (e, r) => {
       chain(e, r).run();
       const res = await askOf(e)({ title: t.youtube, fields: [{ key: "url", label: t.youtubePrompt, type: "url", placeholder: "https://www.youtube.com/watch?v=…" }], submit: t.insert });
@@ -183,6 +188,22 @@ function useMarks(editor: TiptapEditor) {
   });
 }
 
+/** Chèn bảng: hỏi số cột × số hàng (mặc định 3 × 3, có hàng tiêu đề). */
+async function insertTableAsk(editor: TiptapEditor, t: EditorLabels) {
+  const res = await askOf(editor)({
+    title: t.table,
+    fields: [
+      { key: "cols", label: t.tableCols, type: "number", value: "3" },
+      { key: "rows", label: t.tableRows, type: "number", value: "3" },
+      { key: "header", label: t.headerRow, type: "checkbox", value: true },
+    ],
+    submit: t.insert,
+  });
+  if (!res || res === "remove") return;
+  const clamp = (v: unknown, d: number) => Math.min(20, Math.max(1, Number(v) || d));
+  editor.chain().focus().insertTable({ cols: clamp(res.cols, 3), rows: clamp(res.rows, 3), withHeaderRow: !!res.header }).run();
+}
+
 async function setLink(editor: TiptapEditor, t: EditorLabels) {
   const prev = editor.getAttributes("link") as { href?: string; target?: string | null };
   const res = await askOf(editor)({
@@ -220,7 +241,7 @@ function Toolbar({ editor, t, requestMedia, items }: { editor: TiptapEditor; t: 
       <Sep />
       <Btn title={t.insertImage} onClick={() => requestMedia(editor, "image")}><ImageIcon size={16} /></Btn>
       <Btn title={t.gallery} onClick={() => requestMedia(editor, "gallery")}><Images size={16} /></Btn>
-      <Btn title={t.insertTable} active={s.table} onClick={() => c().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}><Table2 size={16} /></Btn>
+      <Btn title={t.insertTable} active={s.table} onClick={() => insertTableAsk(editor, t)}><Table2 size={16} /></Btn>
       <Btn title={t.insertVideo} onClick={() => items.find((x) => x.key === "youtube")?.run(editor)}><Video size={16} /></Btn>
       {s.table && (
         <span className="cms-ed-table-tools">
@@ -358,6 +379,13 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
     const ctx = (editor.storage as any).cmsEditorContext as { labels: EditorLabels; ask: Ask };
     ctx.labels = t; ctx.ask = asker.ask;
     (ctx as any).setLink = () => setLink(editor, t);
+    // Điều khiển "media" trong form cài đặt khối: chọn từ thư viện của ứng dụng, không có thì nhập URL
+    setImagePicker(async () => {
+      const provider = mediaRef.current;
+      if (provider) { const [m] = await provider.pick({ kind: "image", multiple: false }); return m ? { url: m.url, id: m.id, alt: m.alt } : null; }
+      const r = await asker.ask({ title: t.image, fields: [{ key: "url", label: t.imageUrlPrompt, type: "url", placeholder: "https://" }], submit: t.insert });
+      return r && r !== "remove" && String(r.url).trim() ? { url: String(r.url).trim() } : null;
+    });
     onReady?.(editor);
   }, [editor, t]);
   // Lệnh chèn (gồm khối plugin) cho trình chèn ở ngoài trình soạn (BlockInserter); giao dịch rỗng để nó đọc lại

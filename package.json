@@ -1,6 +1,6 @@
 {
   "name": "@cms/editor",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "Trình soạn thảo nội dung dạng khối (TipTap) của CMS — dùng độc lập trong mọi dự án React: ảnh responsive kéo đổi kích thước, gallery, video, bảng, slash menu, mở rộng bằng plugin.",
   "license": "MIT",
   "type": "module",
@@ -22,7 +22,7 @@
     "react-dom": ">=18"
   },
   "dependencies": {
-    "@cms/content": "github:Ecomcx-Jsc/ecomcx-nexus-content#semver:^1.8",
+    "@cms/content": "github:Ecomcx-Jsc/ecomcx-nexus-content#semver:^1.9",
     "@tiptap/core": "3.32.0",
     "@tiptap/extension-highlight": "3.32.0",
     "@tiptap/extension-image": "3.32.0",

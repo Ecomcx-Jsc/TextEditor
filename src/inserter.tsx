@@ -16,11 +16,11 @@ import { cx } from "./util";
 export const INSERT_MIME = "application/x-cms-insert";
 
 const GROUPS: Array<[keyof EditorLabels, string[]]> = [
-  ["groupText", ["p", "h2", "h3", "h4", "ul", "ol", "quote", "code", "table"]],
-  ["groupMedia", ["image", "gallery", "video", "audio", "file"]],
-  ["groupDesign", ["columns2", "columns3", "group", "callout", "button", "hr"]],
-  ["groupEmbed", ["youtube", "embed"]],
-  ["groupWidgets", ["shortcode"]],
+  ["groupText", ["p", "h2", "h3", "h4", "ul", "ol", "quote", "block:pullquote", "code", "preformatted", "table", "block:details", "block:tableOfContents"]],
+  ["groupMedia", ["image", "gallery", "block:cover", "block:mediaText", "video", "audio", "file"]],
+  ["groupDesign", ["columns2", "columns3", "group", "callout", "button", "block:buttons", "block:spacer", "hr"]],
+  ["groupEmbed", ["youtube", "embed", "block:socialLinks"]],
+  ["groupWidgets", ["shortcode", "block:customHtml"]],
   ["groupTheme", [...DYNAMIC_NODES].map((n) => `block:${n}`)],
 ];
 

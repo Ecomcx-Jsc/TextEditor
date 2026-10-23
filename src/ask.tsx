@@ -12,7 +12,7 @@ export interface AskField {
   key: string;
   label: string;
   value?: string | boolean;
-  type?: "text" | "url" | "textarea" | "checkbox" | "select";
+  type?: "text" | "url" | "number" | "textarea" | "checkbox" | "select";
   placeholder?: string;
   options?: Array<{ value: string; label: string }>;
 }
@@ -138,7 +138,7 @@ function AskForm({ state, store, editor, t }: { state: NonNullable<AskState>; st
             {f.type === "textarea" ? <textarea id={fid} rows={3} value={String(values[f.key])} placeholder={f.placeholder} onChange={(e) => set(f.key, e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); close(values); } }} />
               : f.type === "select" ? <select id={fid} value={String(values[f.key])} onChange={(e) => set(f.key, e.target.value)}>{f.options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}</select>
-              : <input id={fid} type={f.type === "url" ? "url" : "text"} value={String(values[f.key])} placeholder={f.placeholder} onChange={(e) => set(f.key, e.target.value)} />}
+              : <input id={fid} type={f.type === "url" || f.type === "number" ? f.type : "text"} min={f.type === "number" ? 1 : undefined} value={String(values[f.key])} placeholder={f.placeholder} onChange={(e) => set(f.key, e.target.value)} />}
           </label>
         );
       })}

@@ -32,6 +32,7 @@ export function blockInfo(type: string, t: EditorLabels): BlockInfo {
     callout: { title: t.callout, icon: Info, description: t.calloutHint },
     button: { title: t.button, icon: RectangleHorizontal, description: t.buttonHint },
     embed: { title: t.embed, icon: Globe, description: t.embedHint },
+    preformatted: { title: t.preformattedBlock, icon: SquareCode },
     [UNKNOWN_BLOCK]: { title: t.unknownBlock, icon: TriangleAlert },
   };
   if (core[type]) return core[type];

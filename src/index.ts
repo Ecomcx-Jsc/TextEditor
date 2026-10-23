@@ -22,5 +22,6 @@ export { BlockTree } from "./outline";
 export { blockInfo, type BlockInfo } from "./blockMeta";
 export { blockTree, moveBlockTo, type BlockTreeItem } from "./blockops";
 export { registerDynamicBlocks, DYNAMIC_BLOCKS } from "./dynamic";
+export { registerBasicBlocks, Preformatted, SOCIAL_SERVICES } from "./basic";
 export { registerBlockPanel, unregisterBlockPanel, type BlockPanel, type BlockPanelProps } from "./panels";
 export type { Editor as TiptapEditor } from "@tiptap/core";

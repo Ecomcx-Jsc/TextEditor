@@ -42,6 +42,10 @@ const { main, others } = contentToEditor(saved);
 
 Không truyền `media` → chèn ảnh/video bằng URL.
 
+## Bộ khối cơ bản (1.10)
+
+Có sẵn ở mọi trình soạn (`registerBasicBlocks("en")` để đổi nhãn): mục lục, ảnh bìa (ảnh nền + lớp phủ + nội dung), ảnh + chữ, nhóm nút, khoảng trống, trích dẫn nổi bật, chi tiết (thu gọn), HTML tuỳ chỉnh (trình soạn chỉ hiện mã nguồn, không chạy), mạng xã hội (sửa link ngay trong khối), văn bản định dạng sẵn (giữ khoảng trắng, Enter xuống dòng trong khối). Chèn bảng hỏi số cột × số hàng. Form cài đặt khối có điều khiển `media` (chọn ảnh từ nguồn media của Editor). Slash menu nhận nhiều từ ("/dinh dang").
+
 ## Tab Kiểu dáng (1.9)
 
 `<BlockInspector editor={…} device={…} onDeviceChange={…} />` có hai tab **Cài đặt / Kiểu dáng**. Tab Kiểu dáng ghi `attrs.style` (@cms/content): Kiểu chữ (phông preset, cỡ S/M/L/XL/2XL hoặc tuỳ chỉnh, độ đậm + nghiêng, giãn dòng, giãn cách ký tự, trang trí, viết hoa, căn chữ), Màu (chữ, nền — preset của theme hoặc màu tuỳ chỉnh), Kích thước & khoảng cách (padding/margin một giá trị hoặc 4 cạnh, khoảng cách khối con, rộng, rộng tối đa, cao tối thiểu), Viền & bo góc, Hiển thị (ẩn theo khổ). Chọn khổ màn hình (máy tính / máy tính bảng / điện thoại) → giá trị theo khổ sửa cho khổ đó, khổ chưa đặt hiện giá trị kế thừa. Menu ⋮ mỗi mục bật/tắt điều khiển (nhớ trong trình duyệt) + đặt lại. Giá trị sai báo đỏ, không lưu. Trình soạn hiện kiểu dáng ngay (cùng CSS với website); mọi khối có thuộc tính `style` (`BlockStyleAttr`).
