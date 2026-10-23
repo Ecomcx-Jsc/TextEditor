@@ -2,7 +2,9 @@ import type { Editor as TiptapEditor } from "@tiptap/core";
 import { useEditorState } from "@tiptap/react";
 import { NodeSelection } from "@tiptap/pm/state";
 import { AlignCenter, AlignJustify, AlignLeft, AlignRight, ArrowDown, ArrowUp, ChevronRight, Copy, Trash2 } from "lucide-react";
-import { Component, useEffect, useId, useSyncExternalStore, type ReactNode } from "react";
+import { Component, useEffect, useId, useState, useSyncExternalStore, type ReactNode } from "react";
+import type { Device } from "@cms/content";
+import { StylePanel } from "./stylepanel";
 import { blockPanels, onBlockPanelsChange } from "./panels";
 import { BlockAttributesForm, pluginBlockInfo } from "./blocks";
 import { blockInfo } from "./blockMeta";
@@ -18,9 +20,17 @@ import { cx } from "./util";
  * thao tác lên / xuống / nhân bản / xoá. Khi đang hiện, form cài đặt trong khối plugin và thanh cài đặt nổi được ẩn (tránh lặp).
  * Ứng dụng đặt component này ở thanh bên, truyền đối tượng TipTap nhận từ `onReady` của Editor.
  */
-export function BlockInspector({ editor, labels }: { editor: TiptapEditor; labels?: Partial<EditorLabels> }) {
+export function BlockInspector({ editor, labels, device: deviceProp, onDeviceChange }: {
+  editor: TiptapEditor; labels?: Partial<EditorLabels>;
+  /** Khổ màn hình đang sửa trong tab Kiểu dáng — ứng dụng truyền vào để đồng bộ với khung xem trực tiếp. */
+  device?: Device; onDeviceChange?(d: Device): void;
+}) {
   const t = { ...viLabels, ...labelsOf(editor), ...labels };
   const panels = useSyncExternalStore(onBlockPanelsChange, blockPanels);
+  const [tab, setTab] = useState<"settings" | "style">("settings");
+  const [ownDevice, setOwnDevice] = useState<Device>("base");
+  const device = deviceProp ?? ownDevice;
+  const changeDevice = (d: Device) => { setOwnDevice(d); onDeviceChange?.(d); };
 
   // Báo cho trình soạn biết đang có tab "Khối" (ẩn form trong khối + thanh nổi); giao dịch rỗng để các khung vẽ lại
   useEffect(() => {
@@ -71,7 +81,20 @@ export function BlockInspector({ editor, labels }: { editor: TiptapEditor; label
           {info.description && <div className="cms-ed-inspector-desc">{info.description}</div>}
         </div>
       </div>
-      <div className="cms-ed-inspector-body">
+      <div className="cms-ed-inspector-tabs" role="tablist" aria-label={info.title}>
+        {(["settings", "style"] as const).map((k) => (
+          <button key={k} type="button" role="tab" aria-selected={tab === k} className={cx(tab === k && "is-active")} onClick={() => setTab(k)}>
+            {k === "settings" ? t.settingsTab : t.styleTab}
+          </button>
+        ))}
+      </div>
+      {tab === "style" ? (
+        <div className="cms-ed-inspector-body" role="tabpanel">
+          <StylePanel style={block.node.attrs.style} t={t} device={device} onDeviceChange={changeDevice}
+            onChange={(style) => { const tr = setBlockAttrs(editor.state, block.pos, { style }); if (tr) editor.view.dispatch(tr); }} />
+        </div>
+      ) : <>
+      <div className="cms-ed-inspector-body" role="tabpanel">
         <Settings editor={editor} block={block} t={t} />
       </div>
       {panels.filter((p) => !p.blocks || p.blocks.includes(block.node.type.name)).map((p) => (
@@ -83,6 +106,7 @@ export function BlockInspector({ editor, labels }: { editor: TiptapEditor; label
           </PanelBoundary>
         </section>
       ))}
+      </>}
       <div className="cms-ed-inspector-actions" role="group" aria-label={t.blockActions}>
         <button type="button" disabled={index === 0} onClick={() => runBlockAction(editor, "up", block)}><ArrowUp size={14} /> {t.moveUp}</button>
         <button type="button" disabled={index >= count - 1} onClick={() => runBlockAction(editor, "down", block)}><ArrowDown size={14} /> {t.moveDown}</button>

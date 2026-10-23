@@ -15,6 +15,8 @@ export { runBlockAction, type BlockAction } from "./handle";
 export { Columns, Column, Group, Callout, ButtonNode, EmbedNode, COLUMN_PRESETS, setColumnCount, setColumnWidths } from "./layout";
 export { cleanPastedHtml } from "./paste";
 export { BlockInspector } from "./inspector";
+export { StylePanel } from "./stylepanel";
+export { BlockStyleAttr } from "./styleattr";
 export { BlockInserter, insertItem } from "./inserter";
 export { BlockTree } from "./outline";
 export { blockInfo, type BlockInfo } from "./blockMeta";

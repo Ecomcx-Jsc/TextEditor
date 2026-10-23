@@ -24,6 +24,7 @@ import { AskPopover, askOf, createAskStore, type Ask } from "./ask";
 import { BlockHandle, BlockKeys } from "./handle";
 import { BlockSettingsBar, layoutItems } from "./layoutUi";
 import { BlockToolbar } from "./toolbar";
+import { documentStyleCss } from "./styleattr";
 import { cleanPastedHtml, isUrl } from "./paste";
 import { handleInsertDrop } from "./inserter";
 import { embedInfo } from "@cms/content";
@@ -254,6 +255,12 @@ function SelectionMenu({ editor, t }: { editor: TiptapEditor; t: EditorLabels })
   );
 }
 
+/** CSS kiểu dáng khối (attrs.style) của bài — cùng CSS với website. */
+function DocumentStyles({ editor }: { editor: TiptapEditor }) {
+  const css = useEditorState({ editor, selector: ({ editor: e }) => documentStyleCss(e) });
+  return css ? <style data-ecx-styles="">{css}</style> : null;
+}
+
 /** Đếm từ / ký tự / thời gian đọc (200 từ mỗi phút) — dưới vùng soạn. */
 function Stats({ editor, t }: { editor: TiptapEditor; t: EditorLabels }) {
   const s = useEditorState({ editor, selector: ({ editor: e }) => {
@@ -364,6 +371,7 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
     <div className={cx("cms-editor", className)}>
       {editor && <div className={cx("cms-ed-toolbar", toolbarClassName)}><Toolbar editor={editor} t={t} requestMedia={requestMedia} items={items} /></div>}
       {editor && <SelectionMenu editor={editor} t={t} />}
+      {editor && <DocumentStyles editor={editor} />}
       <EditorContent editor={editor} />
       <SlashMenu store={slash} t={t} />
       {editor && <BlockHandle editor={editor} t={t} menuRequest={menuRequest} />}
