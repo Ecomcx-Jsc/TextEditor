@@ -42,6 +42,10 @@ const { main, others } = contentToEditor(saved);
 
 Không truyền `media` → chèn ảnh/video bằng URL.
 
+## Mẫu (1.12)
+
+Trình chèn có tab **Mẫu**: đoạn nội dung dựng sẵn theo nhóm (ảnh bìa, tính năng, kêu gọi hành động, bảng giá, cảm nhận, hỏi đáp, liên hệ…) có xem trước thu nhỏ, tìm không dấu, bấm để chèn (chép khối — sửa tự do). Nguồn: `registerCorePatterns(locale)` (mẫu lõi, dựng bằng bộ khối cơ bản), `registerPattern({ name, title, category, description?, keywords?, content })` (theme / plugin / ứng dụng). `insertPattern(editor, pattern)`, `patternNodes(pattern)`.
+
 ## Biến thể, neo, class, preset (1.11)
 
 Mọi khối có thuộc tính `blockStyle` (class `ecx-is-…`), `anchor` (id), `className`. `BlockInspector` nhận `presets` (preset của theme — bảng màu, cỡ chữ, khoảng cách, phông trong tab Kiểu dáng) và `blockStyles` (biến thể của theme theo loại khối; cộng với biến thể có sẵn `CORE_BLOCK_STYLES`); tab Cài đặt có mục Nâng cao (neo HTML, class CSS riêng). `<Editor presets>` áp biến `--ecx-*` vào vùng soạn — cùng giá trị với website.

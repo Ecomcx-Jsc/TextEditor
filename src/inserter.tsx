@@ -3,14 +3,16 @@ import { useEditorState } from "@tiptap/react";
 import { TextSelection } from "@tiptap/pm/state";
 import type { EditorView } from "@tiptap/pm/view";
 import { Search } from "lucide-react";
-import { useId, useState, type DragEvent } from "react";
+import { useId, useMemo, useState, useSyncExternalStore, type DragEvent } from "react";
 import { blockFromPos, currentBlock, insertParagraphAfter } from "./blockops";
 import { viLabels, type EditorLabels } from "./labels";
 import { labelsOf } from "./nodes";
 import type { InsertItem } from "./types";
 import { DYNAMIC_NODES } from "@cms/content";
 import { rankItems } from "./rank";
-import { cx } from "./util";
+import { DOMSerializer } from "@tiptap/pm/model";
+import { PATTERN_CATEGORIES, insertPattern, onPatternsChange, patternNodes, registeredPatterns, type Pattern } from "./patterns";
+import { cx, norm } from "./util";
 
 /** Kiểu dữ liệu kéo từ trình chèn vào trình soạn. */
 export const INSERT_MIME = "application/x-cms-insert";
@@ -68,10 +70,48 @@ export function handleInsertDrop(editor: TiptapEditor, view: EditorView, event: 
   return true;
 }
 
-/** Trình chèn khối (cột trái): tìm, bấm để chèn, kéo vào bài. */
+/** Xem trước thu nhỏ của mẫu: HTML dựng từ schema của chính trình soạn (cùng CSS nền ecx-content). */
+function PatternPreview({ editor, pattern }: { editor: TiptapEditor; pattern: Pattern }) {
+  const html = useMemo(() => {
+    try {
+      const doc = editor.schema.nodeFromJSON({ type: "doc", content: patternNodes(pattern) });
+      const div = document.createElement("div");
+      div.appendChild(DOMSerializer.fromSchema(editor.schema).serializeFragment(doc.content));
+      return div.innerHTML;
+    } catch { return ""; }
+  }, [editor, pattern]);
+  return <div className="cms-ed-pattern-preview" aria-hidden><div className="cms-ed-pattern-canvas ecx-content" dangerouslySetInnerHTML={{ __html: html }} /></div>;
+}
+
+/** Tab "Mẫu" của trình chèn: mẫu theo nhóm, tìm theo tên / từ khoá, bấm để chèn dưới khối đang chọn. */
+function PatternList({ editor, t, query }: { editor: TiptapEditor; t: EditorLabels; query: string }) {
+  const all = useSyncExternalStore(onPatternsChange, registeredPatterns);
+  const q = norm(query.trim());
+  const list = q ? all.filter((p) => norm(`${p.title} ${p.description ?? ""} ${p.keywords ?? ""} ${p.category}`).includes(q)) : all;
+  const cats = [...new Set([...PATTERN_CATEGORIES, ...list.map((p) => p.category)])].filter((c) => list.some((p) => p.category === c));
+  if (!list.length) return <p className="cms-ed-inspector-empty">{t.noPatterns}</p>;
+  return <>
+    {cats.map((c) => (
+      <section key={c} className="cms-ed-inserter-group" aria-label={(t as Record<string, string>)[`cat_${c}`] ?? c}>
+        <h3>{(t as Record<string, string>)[`cat_${c}`] ?? c}</h3>
+        <div className="cms-ed-pattern-list">
+          {list.filter((p) => p.category === c).map((p) => (
+            <button key={p.name} type="button" className="cms-ed-pattern" data-pattern={p.name} title={p.description} onClick={() => insertPattern(editor, p)}>
+              <PatternPreview editor={editor} pattern={p} />
+              <span className="cms-ed-pattern-title">{p.title}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+    ))}
+  </>;
+}
+
+/** Trình chèn khối (cột trái): tab Khối (tìm, bấm để chèn, kéo vào bài) và Mẫu (đoạn dựng sẵn). */
 export function BlockInserter({ editor, labels }: { editor: TiptapEditor; labels?: Partial<EditorLabels> }) {
   const t = { ...viLabels, ...labelsOf(editor), ...labels };
   const [query, setQuery] = useState("");
+  const [tab, setTab] = useState<"blocks" | "patterns">("blocks");
   const id = useId();
   // Danh sách lệnh do Editor đặt vào ngữ cảnh (gồm khối của plugin); đọc lại khi trình soạn đổi
   const items = useEditorState({ editor, selector: ({ editor: e }) => itemsOf(e), equalityFn: (a, b) => a === b });
@@ -90,11 +130,17 @@ export function BlockInserter({ editor, labels }: { editor: TiptapEditor; labels
 
   return (
     <div className="cms-ed-inserter">
+      <div className="cms-ed-inspector-tabs" role="tablist" aria-label={t.inserter}>
+        {(["blocks", "patterns"] as const).map((k) => (
+          <button key={k} type="button" role="tab" aria-selected={tab === k} className={cx(tab === k && "is-active")} onClick={() => setTab(k)}>{k === "blocks" ? t.tabBlocks : t.tabPatterns}</button>
+        ))}
+      </div>
       <label className="cms-ed-inserter-search" htmlFor={id}>
         <Search size={14} aria-hidden />
         <input id={id} type="search" placeholder={t.searchBlocks} aria-label={t.searchBlocks} value={query} onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter" && list[0]) { e.preventDefault(); insertItem(editor, list[0]); } }} />
+          onKeyDown={(e) => { if (tab === "blocks" && e.key === "Enter" && list[0]) { e.preventDefault(); insertItem(editor, list[0]); } }} />
       </label>
+      {tab === "patterns" ? <PatternList editor={editor} t={t} query={query} /> : <>
       <p className="cms-ed-inserter-hint">{t.dragToInsert}</p>
       {list.length === 0 && <p className="cms-ed-inspector-empty">{t.noBlocks}</p>}
       {groups.filter(([, g]) => g.length).map(([label, g]) => (
@@ -111,6 +157,7 @@ export function BlockInserter({ editor, labels }: { editor: TiptapEditor; labels
           </div>
         </section>
       ))}
+      </>}
     </div>
   );
 }

@@ -27,10 +27,12 @@ import { BlockToolbar } from "./toolbar";
 import { documentStyleCss, presetsCss } from "./styleattr";
 import type { StylePresets } from "@cms/content";
 import { registerBasicBlocks } from "./basic";
+import { registerCorePatterns } from "./patterns";
 import { setImagePicker } from "./blocks";
 
 // Bộ khối cơ bản có sẵn ở mọi trình soạn (ứng dụng gọi lại registerBasicBlocks("en") để đổi nhãn)
 registerBasicBlocks();
+registerCorePatterns();
 import { cleanPastedHtml, isUrl } from "./paste";
 import { handleInsertDrop } from "./inserter";
 import { embedInfo } from "@cms/content";

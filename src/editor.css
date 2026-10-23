@@ -311,3 +311,12 @@
 .cms-ed-advanced small { font-size: 11px; color: var(--cms-ed-muted); }
 .cms-ed-advanced input.is-invalid { border-color: var(--cms-ed-danger); }
 .cms-ed-variants .cms-ed-seg { flex-wrap: wrap; }
+
+/* Tab Mẫu của trình chèn */
+.cms-ed-inserter > .cms-ed-inspector-tabs { margin-bottom: 8px; }
+.cms-ed-pattern-list { display: grid; gap: 10px; }
+.cms-ed-pattern { display: grid; gap: 6px; padding: 6px; border: 1px solid var(--cms-ed-line); border-radius: 8px; background: var(--cms-ed-panel); color: var(--cms-ed-fg); cursor: pointer; text-align: left; font: inherit; }
+.cms-ed-pattern:hover, .cms-ed-pattern:focus-visible { border-color: var(--cms-ed-accent); outline: none; box-shadow: 0 0 0 2px var(--cms-ed-accent-soft); }
+.cms-ed-pattern-preview { position: relative; height: 120px; overflow: hidden; border-radius: 6px; background: #fff; color: #18181b; pointer-events: none; }
+.cms-ed-pattern-canvas { position: absolute; top: 0; left: 0; width: 333%; padding: 24px; transform: scale(.3); transform-origin: top left; font-size: 16px; line-height: 1.6; }
+.cms-ed-pattern-title { font-size: 12px; font-weight: 600; }

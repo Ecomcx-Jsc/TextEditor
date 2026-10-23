@@ -106,3 +106,17 @@ test("khối động: đăng ký xong thì fixture dynamic-blocks mở + lưu l�
     assert.deepEqual(stripDefaults(saved, schema), stripDefaults(normalizeContent(f.expected).doc, schema));
   } finally { for (const name of DYNAMIC_BLOCKS) unregisterBlock(name); }
 });
+
+test("mẫu lõi: mọi mẫu chuẩn hoá được và hợp lệ với schema trình soạn (chèn không lỗi)", async () => {
+  const { registerCorePatterns, registeredPatterns, patternNodes } = await import("../src/patterns");
+  registerCorePatterns("vi");
+  const extra = registeredExtensions().flatMap((p) => p.extensions ?? []);
+  const schema = getSchema([...coreExtensions(), ...extra]);
+  const list = registeredPatterns();
+  assert.ok(list.length >= 8);
+  for (const p of list) {
+    const nodes = patternNodes(p);
+    assert.ok(nodes.length > 0, p.name);
+    schema.nodeFromJSON({ type: "doc", content: nodes }).check();
+  }
+});

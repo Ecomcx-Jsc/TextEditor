@@ -36,7 +36,7 @@ export const Columns = Node.create({
   isolating: true,
   addAttributes: () => attrs({ verticalAlign: null, stack: true }),
   parseHTML: () => [{ tag: "div[data-columns]" }],
-  renderHTML: ({ node }) => ["div", { "data-columns": "", ...dataAttrs(node.attrs), class: cx("cms-ed-columns ecx-columns", node.attrs.verticalAlign && `is-${node.attrs.verticalAlign}`) }, 0],
+  renderHTML: ({ node, HTMLAttributes }) => ["div", mergeAttributes(HTMLAttributes, { "data-columns": "", ...dataAttrs(node.attrs), class: cx("cms-ed-columns ecx-columns", node.attrs.verticalAlign && `is-${node.attrs.verticalAlign}`) }), 0],
 });
 
 export const Column = Node.create({
@@ -46,7 +46,7 @@ export const Column = Node.create({
   defining: true,
   addAttributes: () => attrs({ width: null }),
   parseHTML: () => [{ tag: "div[data-column]" }],
-  renderHTML: ({ node }) => ["div", { "data-column": "", ...dataAttrs(node.attrs), class: "cms-ed-column ecx-column", style: `flex: ${Number(node.attrs.width) > 0 ? node.attrs.width : 1} 1 0` }, 0],
+  renderHTML: ({ node, HTMLAttributes }) => ["div", mergeAttributes(HTMLAttributes, { "data-column": "", ...dataAttrs(node.attrs), class: "cms-ed-column ecx-column", style: `flex: ${Number(node.attrs.width) > 0 ? node.attrs.width : 1} 1 0` }), 0],
 });
 
 export const Group = Node.create({
@@ -56,10 +56,12 @@ export const Group = Node.create({
   defining: true,
   addAttributes: () => attrs({ background: null, textColor: null, padding: "medium" }),
   parseHTML: () => [{ tag: "div[data-group]" }],
-  renderHTML: ({ node }) => {
-    const bg = safeColor(node.attrs.background), fg = safeColor(node.attrs.textColor);
-    const style = [bg && `background: ${bg}`, fg && `color: ${fg}`, `padding: ${PADDING[node.attrs.padding] ?? PADDING.medium}`].filter(Boolean).join("; ");
-    return ["div", { "data-group": "", ...dataAttrs(node.attrs), class: cx("cms-ed-group ecx-group", bg && "has-bg"), style }, 0];
+  renderHTML: ({ node, HTMLAttributes }) => {
+    // Kiểu dáng khối (attrs.style) đặt padding / màu thì bỏ giá trị inline tương ứng (inline luôn thắng class)
+    const own = (node.attrs.style ?? {}) as { padding?: unknown; color?: { text?: unknown; background?: unknown } };
+    const bg = own.color?.background ? null : safeColor(node.attrs.background), fg = own.color?.text ? null : safeColor(node.attrs.textColor);
+    const style = [bg && `background: ${bg}`, fg && `color: ${fg}`, !own.padding && `padding: ${PADDING[node.attrs.padding] ?? PADDING.medium}`].filter(Boolean).join("; ");
+    return ["div", mergeAttributes(HTMLAttributes, { "data-group": "", ...dataAttrs(node.attrs), class: cx("cms-ed-group ecx-group", bg && "has-bg"), style }), 0];
   },
 });
 
@@ -70,7 +72,7 @@ export const Callout = Node.create({
   defining: true,
   addAttributes: () => attrs({ tone: "info", title: null }),
   parseHTML: () => [{ tag: "div[data-callout]" }],
-  renderHTML: ({ node }) => ["div", mergeAttributes({ "data-callout": "", ...dataAttrs(node.attrs), "data-tone": node.attrs.tone ?? "info", class: "cms-ed-callout ecx-callout", role: "note" },
+  renderHTML: ({ node, HTMLAttributes }) => ["div", mergeAttributes(HTMLAttributes, { "data-callout": "", ...dataAttrs(node.attrs), "data-tone": node.attrs.tone ?? "info", class: "cms-ed-callout ecx-callout", role: "note" },
     node.attrs.title ? { "data-title": node.attrs.title } : {}), 0],
 });
 
