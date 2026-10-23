@@ -109,3 +109,66 @@ export function insertParagraphAfter(state: EditorState, block: BlockRef): Trans
   const tr = state.tr.insert(after, state.schema.nodes.paragraph.create());
   return tr.setSelection(TextSelection.create(tr.doc, after + 1)).scrollIntoView();
 }
+
+/**
+ * Chuyển khối ở `from` tới vị trí `to` (vị trí giữa hai khối, theo tài liệu hiện tại) — dùng cho kéo thả trong cây khối.
+ * null khi không hợp lệ: thả vào chính nó / bên trong nó, hoặc chỗ đến không nhận loại khối này (vd cột chỉ nằm trong bộ cột).
+ */
+export function moveBlockTo(state: EditorState, from: number, to: number): Transaction | null {
+  const node = state.doc.nodeAt(from);
+  if (!node) return null;
+  if (to > from && to < from + node.nodeSize) return null;
+  if (to === from || to === from + node.nodeSize) return null;
+  // Cột chỉ đổi chỗ trong chính bộ cột của nó (bộ cột cần 2–4 cột)
+  if (node.type.name === "column" && state.doc.resolve(from).start() !== state.doc.resolve(to).start()) return null;
+  const $from = state.doc.resolve(from), $to = state.doc.resolve(to);
+  const tr = state.tr;
+  let at: number;
+  if ($from.start() === $to.start()) {
+    // Cùng vùng chứa: sắp lại thứ tự cả vùng một lần (không qua trạng thái thiếu khối, vd bộ cột chỉ còn 1 cột)
+    const kids: PMNode[] = [];
+    $from.parent.forEach((c) => kids.push(c));
+    const fromIdx = $from.index();
+    let toIdx = $to.index();
+    kids.splice(fromIdx, 1);
+    if (toIdx > fromIdx) toIdx--;
+    kids.splice(toIdx, 0, node);
+    tr.replaceWith($from.start(), $from.end(), Fragment.from(kids));
+    at = $from.start() + kids.slice(0, toIdx).reduce((n, k) => n + k.nodeSize, 0);
+  } else {
+    if (!$to.parent.canReplaceWith($to.index(), $to.index(), node.type)) return null;
+    // Chèn trước rồi xoá bản gốc; vùng chứa mất khối cuối cùng được ProseMirror bù đoạn trống
+    tr.insert(to, node);
+    const start = tr.mapping.map(from);
+    tr.delete(start, start + node.nodeSize);
+    // Vị trí khối vừa chèn (bắt đầu ở `to` sau bước chèn) đi qua bước xoá
+    at = tr.mapping.slice(1).map(to, 1);
+  }
+  return selectInside(tr, at).scrollIntoView();
+}
+
+export interface BlockTreeItem { pos: number; node: PMNode; depth: number; children: BlockTreeItem[] }
+
+/** Cây khối của tài liệu: khối trong vùng chứa (doc, cột trong bộ cột, nhóm…) — như "List View" của Gutenberg. */
+export function blockTree(doc: PMNode): BlockTreeItem[] {
+  const walk = (parent: PMNode, start: number, depth: number): BlockTreeItem[] => {
+    const out: BlockTreeItem[] = [];
+    parent.forEach((child, offset) => {
+      const pos = start + offset;
+      // Bộ cột: từng cột là một mục (cột không phải vùng chứa trực tiếp của doc nhưng chứa khối)
+      const nested = isContainer(child) || child.type.name === "columns" ? walk(child, pos + 1, depth + 1) : [];
+      out.push({ pos, node: child, depth, children: nested });
+    });
+    return out;
+  };
+  return walk(doc, 0, 0);
+}
+
+/** Đổi thuộc tính của khối ở `pos`; khối đang được chọn cả khối thì vẫn giữ chọn (setNodeMarkup làm mất NodeSelection). */
+export function setBlockAttrs(state: EditorState, pos: number, attrs: Record<string, unknown>): Transaction | null {
+  const node = state.doc.nodeAt(pos);
+  if (!node) return null;
+  const tr = state.tr.setNodeMarkup(pos, undefined, { ...node.attrs, ...attrs });
+  if (state.selection instanceof NodeSelection && state.selection.from === pos) tr.setSelection(NodeSelection.create(tr.doc, pos));
+  return tr;
+}

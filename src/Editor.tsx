@@ -16,11 +16,14 @@ import { coreExtensions, knownTypes } from "./extensions";
 import { unwrapUnknown, wrapUnknown } from "./unknown";
 import { onExtensionsChange, registeredExtensions } from "./registry";
 import type { EditorExtensionPack, InsertItem, MediaItem, MediaKind, MediaProvider } from "./types";
-import { cx, norm } from "./util";
+import { cx } from "./util";
+import { rankItems } from "./rank";
+export { rankItems } from "./rank";
 import { AskPopover, askOf, createAskStore, type Ask } from "./ask";
 import { BlockHandle, BlockKeys } from "./handle";
 import { BlockSettingsBar, layoutItems } from "./layoutUi";
 import { cleanPastedHtml, isUrl } from "./paste";
+import { handleInsertDrop } from "./inserter";
 import { embedInfo } from "@cms/content";
 
 export interface EditorProps {
@@ -96,23 +99,6 @@ function createSlashStore() {
   };
 }
 type SlashStore = ReturnType<typeof createSlashStore>;
-
-/**
- * Lọc + xếp hạng lệnh: tên bắt đầu bằng chữ gõ > một từ trong tên bắt đầu bằng chữ gõ > từ khoá bắt đầu bằng chữ gõ.
- * (Không khớp giữa từ: "/anh" ra "Ảnh", không ra "D-anh sách".)
- */
-export function rankItems(list: InsertItem[], query: string): InsertItem[] {
-  const q = norm(query.trim());
-  if (!q) return list;
-  const score = (i: InsertItem) => {
-    const title = norm(i.title);
-    if (title.startsWith(q)) return 3;
-    if (title.split(/\s+/).some((w) => w.startsWith(q))) return 2;
-    if (i.keywords.split(/\s+/).some((w) => w.startsWith(q)) || i.key.startsWith(q)) return 1;
-    return 0;
-  };
-  return list.map((i) => [i, score(i)] as const).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1]).map(([i]) => i);
-}
 
 function slashExtension(store: SlashStore, items: () => InsertItem[]) {
   return Extension.create({
@@ -329,6 +315,7 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
   const mediaRef = useRef(media); mediaRef.current = media;
   const asker = useMemo(createAskStore, []);
   const [menuRequest, setMenuRequest] = useState(0);
+  const editorRef = useRef<TiptapEditor | null>(null);
 
   // Chọn media → chèn node phù hợp. Không có MediaProvider: ảnh/video nhập bằng URL.
   const requestMedia: RequestMedia = async (editor, kind) => {
@@ -371,6 +358,8 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
       // Dán từ Word / Google Docs: bỏ style, font, màu, thẻ Office; danh sách Word thành danh sách thật
       transformPastedHTML: (html) => cleanPastedHtml(html),
       // Dán một đường dẫn của nhà cung cấp hỗ trợ vào dòng trống → khối nhúng
+      // Thả một khối từ trình chèn (cột trái của ứng dụng)
+      handleDrop: (view, event): boolean => !!editorRef.current && handleInsertDrop(editorRef.current, view, event as DragEvent),
       handlePaste: (view, event) => {
         const text = event.clipboardData?.getData("text/plain") ?? "";
         const { $from, empty } = view.state.selection;
@@ -387,12 +376,19 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
     immediatelyRender: true,
   }, [packs.map((p) => p.name).join(",")]);
 
+  editorRef.current = editor;
   useEffect(() => {
     if (!editor) return;
     const ctx = (editor.storage as any).cmsEditorContext as { labels: EditorLabels; ask: Ask };
     ctx.labels = t; ctx.ask = asker.ask;
     onReady?.(editor);
   }, [editor, t]);
+  // Lệnh chèn (gồm khối plugin) cho trình chèn ở ngoài trình soạn (BlockInserter); giao dịch rỗng để nó đọc lại
+  useEffect(() => {
+    if (!editor || editor.isDestroyed) return;
+    (editor.storage as any).cmsEditorContext.items = items;
+    editor.view.dispatch(editor.state.tr.setMeta("cmsItems", true));
+  }, [editor, items]);
 
   return (
     <div className={cx("cms-editor", className)}>

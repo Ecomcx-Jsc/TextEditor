@@ -14,3 +14,10 @@ export { blockFromPos, currentBlock, deleteBlock, duplicateBlock, insertParagrap
 export { runBlockAction, type BlockAction } from "./handle";
 export { Columns, Column, Group, Callout, ButtonNode, EmbedNode, COLUMN_PRESETS, setColumnCount, setColumnWidths } from "./layout";
 export { cleanPastedHtml } from "./paste";
+export { BlockInspector } from "./inspector";
+export { BlockInserter, insertItem } from "./inserter";
+export { BlockTree } from "./outline";
+export { blockInfo, type BlockInfo } from "./blockMeta";
+export { blockTree, moveBlockTo, type BlockTreeItem } from "./blockops";
+export { registerBlockPanel, unregisterBlockPanel, type BlockPanel, type BlockPanelProps } from "./panels";
+export type { Editor as TiptapEditor } from "@tiptap/core";

@@ -8,9 +8,9 @@ import { cx } from "./util";
 import type { Ask } from "./ask";
 
 /** Ngữ cảnh dùng chung cho node view (chữ giao diện…), đặt bởi component Editor. */
-export const EditorContext = Extension.create<unknown, { labels: EditorLabels; ask: Ask }>({
+export const EditorContext = Extension.create<unknown, { labels: EditorLabels; ask: Ask; items: unknown[]; inspector: number }>({
   name: "cmsEditorContext",
-  addStorage: () => ({ labels: viLabels, ask: async () => null }),
+  addStorage: () => ({ labels: viLabels, ask: async () => null, items: [], inspector: 0 }),
 });
 export const labelsOf = (editor: Editor): EditorLabels => (editor.storage as any).cmsEditorContext?.labels ?? viLabels;
 

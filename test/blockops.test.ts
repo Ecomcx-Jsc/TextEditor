@@ -74,3 +74,37 @@ test("blockFromPos ngoài phạm vi → null; khối cấp cao nhất không có
   assert.equal(blockFromPos(d, 999), null);
   assert.equal(parentBlock(d, blockFromPos(d, 0)!), null);
 });
+
+test("moveBlockTo: kéo khối tới vị trí bất kỳ (cây khối), kể cả vào / ra khỏi nhóm; chỗ không hợp lệ → null", async () => {
+  const { moveBlockTo, blockTree } = await import("../src/blockops");
+  const d = doc(p("a"), { type: "group", content: [p("g1"), p("g2")] }, p("b"));
+  const s = EditorState.create({ schema, doc: d });
+  const tree = blockTree(s.doc);
+  assert.deepEqual(tree.map((x) => x.node.type.name), ["paragraph", "group", "paragraph"]);
+  assert.deepEqual(tree[1].children.map((x) => x.node.textContent), ["g1", "g2"]);
+  // "b" vào đầu nhóm
+  const into = s.apply(moveBlockTo(s, tree[2].pos, tree[1].children[0].pos)!);
+  assert.deepEqual(blockTree(into.doc)[1].children.map((x) => x.node.textContent), ["b", "g1", "g2"]);
+  // "g2" ra khỏi nhóm, lên đầu bài
+  const out = s.apply(moveBlockTo(s, tree[1].children[1].pos, 0)!);
+  assert.deepEqual(blockTree(out.doc).map((x) => x.node.textContent), ["g2", "a", "g1", "b"]);
+  // Thả vào trong chính nó → null
+  assert.equal(moveBlockTo(s, tree[1].pos, tree[1].children[1].pos), null);
+  // Lấy khối cuối của nhóm ra → nhóm còn đoạn trống, vẫn hợp lệ
+  const one = EditorState.create({ schema, doc: doc(p("a"), { type: "group", content: [p("only")] }) });
+  const t1 = blockTree(one.doc);
+  const moved = one.apply(moveBlockTo(one, t1[1].children[0].pos, 0)!);
+  moved.doc.check();
+  assert.equal(moved.doc.child(0).textContent, "only");
+});
+
+test("moveBlockTo: cột chỉ đổi chỗ trong bộ cột của nó", async () => {
+  const { moveBlockTo, blockTree } = await import("../src/blockops");
+  const col = (t: string) => ({ type: "column", content: [p(t)] });
+  const s = EditorState.create({ schema, doc: doc(p("a"), { type: "columns", content: [col("c1"), col("c2")] }) });
+  const tree = blockTree(s.doc);
+  const cols = tree[1].children;
+  const swapped = s.apply(moveBlockTo(s, cols[1].pos, cols[0].pos)!);
+  assert.deepEqual(blockTree(swapped.doc)[1].children.map((x) => x.node.textContent), ["c2", "c1"]);
+  assert.equal(moveBlockTo(s, cols[0].pos, 0), null);
+});

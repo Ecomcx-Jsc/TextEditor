@@ -1,5 +1,12 @@
 /** Chữ giao diện của trình soạn. Truyền labels={enLabels} hoặc ghi đè từng chữ. */
 export const viLabels = {
+  heading: "Tiêu đề", taskList: "Danh sách việc", columnsBlock: "Bộ cột", column: "Cột",
+  inspectorEmpty: "Chọn một khối trong bài để xem cài đặt của nó.", noSettings: "Khối này không có cài đặt riêng.", blockActions: "Thao tác",
+  textAlign: "Căn chữ", alignJustify: "Căn đều", headingLevel: "Cấp tiêu đề", showPdf: "Hiện PDF ngay trong trang", allowDownload: "Cho tải xuống",
+  startAt: "Bắt đầu từ giây", codeLanguage: "Ngôn ngữ (vd js, php)", listStart: "Bắt đầu từ số",
+  inserter: "Thêm khối", searchBlocks: "Tìm khối…", noBlocks: "Không có khối phù hợp", dragToInsert: "Bấm để chèn dưới khối đang chọn, hoặc kéo vào bài",
+  groupText: "Văn bản", groupMedia: "Media", groupDesign: "Bố cục", groupEmbed: "Nhúng", groupWidgets: "Tiện ích", groupPlugin: "Plugin",
+  outline: "Cấu trúc", outlineEmpty: "Bài chưa có khối nào", outlineHint: "Bấm để chọn khối, kéo để đổi chỗ",
   columns2: "2 cột", columns3: "3 cột", columnsHint: "Chia nội dung thành cột", group: "Nhóm", groupHint: "Khung bao nhiều khối (nền, khoảng đệm)",
   callout: "Hộp lưu ý", calloutHint: "Thông tin, cảnh báo…", button: "Nút", buttonHint: "Nút liên kết", buttonEmpty: "Nút", buttonText: "Chữ trên nút", buttonUrl: "Liên kết",
   embed: "Nhúng", embedHint: "YouTube, Vimeo, Spotify, TikTok, X…", embedUrl: "Đường dẫn (YouTube, Vimeo, Spotify, TikTok, X, Instagram…)",
@@ -40,6 +47,13 @@ export const viLabels = {
 export type EditorLabels = typeof viLabels;
 
 export const enLabels: EditorLabels = {
+  heading: "Heading", taskList: "Task list", columnsBlock: "Columns", column: "Column",
+  inspectorEmpty: "Select a block in the post to see its settings.", noSettings: "This block has no settings of its own.", blockActions: "Actions",
+  textAlign: "Text alignment", alignJustify: "Justify", headingLevel: "Heading level", showPdf: "Show the PDF in the page", allowDownload: "Allow download",
+  startAt: "Start at second", codeLanguage: "Language (e.g. js, php)", listStart: "Start at number",
+  inserter: "Add block", searchBlocks: "Search blocks…", noBlocks: "No matching blocks", dragToInsert: "Click to insert below the selected block, or drag into the post",
+  groupText: "Text", groupMedia: "Media", groupDesign: "Design", groupEmbed: "Embeds", groupWidgets: "Widgets", groupPlugin: "Plugins",
+  outline: "Outline", outlineEmpty: "The post has no blocks yet", outlineHint: "Click to select a block, drag to move it",
   columns2: "2 columns", columns3: "3 columns", columnsHint: "Split content into columns", group: "Group", groupHint: "Box around blocks (background, padding)",
   callout: "Callout", calloutHint: "Info, warning…", button: "Button", buttonHint: "Link button", buttonEmpty: "Button", buttonText: "Button text", buttonUrl: "Link",
   embed: "Embed", embedHint: "YouTube, Vimeo, Spotify, TikTok, X…", embedUrl: "URL (YouTube, Vimeo, Spotify, TikTok, X, Instagram…)",

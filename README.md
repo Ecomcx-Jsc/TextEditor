@@ -8,6 +8,8 @@ Trình soạn thảo nội dung dạng khối dựa trên [TipTap](https://tipta
 - Khối bố cục (`@cms/content` ≥ 1.2): cột (2–4, bố cục 50/50, 33/67…, căn dọc, xếp dọc trên điện thoại), nhóm (nền, màu chữ, khoảng đệm), hộp lưu ý (4 kiểu + tiêu đề), nút (chữ, liên kết, kiểu, căn lề), nhúng theo đường dẫn (YouTube, Vimeo, Spotify, SoundCloud, TikTok, X, Instagram, CodePen, Figma, Google Maps… — `embedInfo`); thanh cài đặt khối hiện phía trên khối đang soạn
 - Dán từ Word / Google Docs sạch (`cleanPastedHtml`: định dạng bằng style → đậm/nghiêng/gạch chân; bỏ font, màu, thẻ Office; danh sách Word thành danh sách thật); dán một đường dẫn hỗ trợ nhúng vào dòng trống → khối nhúng
 - Đếm từ, ký tự, thời gian đọc dưới vùng soạn
+- Bố cục kiểu Gutenberg cho ứng dụng nhúng (1.5): `BlockInspector` (tab "Khối": đường dẫn khối cha, cài đặt theo loại khối, thao tác), `BlockInserter` (tìm, bấm để chèn, kéo vào bài), `BlockTree` (cây khối: chọn, bàn phím, kéo đổi chỗ kể cả vào/ra vùng chứa) — truyền đối tượng nhận từ `onReady` của `Editor`
+- `registerBlockPanel({ id, title, blocks, attributes, component })`: plugin thêm mục vào tab "Khối" cho khối bất kỳ (kể cả khối lõi), khai báo thêm thuộc tính để trình soạn lưu được
 - Slash menu (gõ `/`), menu nổi khi bôi đen, phím tắt (⌘B, ⌘I, ⌘K…)
 - Thao tác khối: tay kéo bên trái khối (kéo để di chuyển, bấm mở menu lên / xuống / nhân bản / xoá / chọn khối cha), nút "+" thêm khối bên dưới; phím tắt ⌘⇧↑ ⌘⇧↓ ⌘⇧D ⌘⇧⌫, Alt+F10 mở menu khối bằng bàn phím
 - Hộp nhập đặt cạnh chỗ soạn (liên kết, alt, chú thích, YouTube, shortcode) thay `window.prompt` — gói mở rộng dùng chung qua `askOf(editor)(…)`

@@ -7,6 +7,9 @@ import { AlignCenter, AlignLeft, AlignRight, Columns2, Columns3, Globe, Info, Pe
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { askOf } from "./ask";
+import { setBlockAttrs } from "./blockops";
+import { insertBlock } from "./insert";
+export { insertBlock } from "./insert";
 import type { EditorLabels } from "./labels";
 import { COLUMN_PRESETS, emptyColumn, safeColor, setColumnCount, setColumnWidths } from "./layout";
 import type { InsertItem } from "./types";
@@ -19,7 +22,8 @@ const start = (e: TiptapEditor, r?: { from: number; to: number }) => (r ? e.chai
 
 /** Chèn khối chứa rồi đặt con trỏ vào đoạn văn đầu tiên bên trong. */
 function insertContainer(e: TiptapEditor, r: { from: number; to: number } | undefined, node: Record<string, unknown>) {
-  start(e, r).insertContent(node).run();
+  start(e, r).run();
+  insertBlock(e, node);
   // Con trỏ vào đoạn văn đầu tiên của khối vừa chèn (insertContent để con trỏ sau khối)
   // = khối cùng loại bắt đầu gần nhất trước con trỏ
   const { state } = e;
@@ -62,13 +66,13 @@ export function layoutItems(t: EditorLabels): InsertItem[] {
       run: async (e, r) => {
         start(e, r).run();
         const a = await editButton(e, t);
-        if (a?.text) e.chain().focus().insertContent({ type: "button", attrs: { ...a, variant: "primary" } }).run();
+        if (a?.text) insertBlock(e, { type: "button", attrs: { ...a, variant: "primary" } });
       } },
     { key: "embed", title: t.embed, hint: t.embedHint, icon: Globe, keywords: "nhung embed oembed video vimeo spotify tiktok twitter x instagram soundcloud codepen figma map ban do",
       run: async (e, r) => {
         start(e, r).run();
         const a = await editEmbed(e, t);
-        if (a) e.chain().focus().insertContent({ type: "embed", attrs: a }).run();
+        if (a) insertBlock(e, { type: "embed", attrs: a });
       } },
   ];
 }
@@ -112,40 +116,13 @@ function ColorField({ value, onChange, label, t }: { value: string | null; onCha
   );
 }
 
-export function BlockSettingsBar({ editor, t }: { editor: TiptapEditor; t: EditorLabels }) {
-  const target = useEditorState({ editor, selector: ({ editor: e }) => settingsTarget(e.state), equalityFn: (a, b) => a?.pos === b?.pos && a?.node === b?.node });
-  const ref = useRef<HTMLDivElement>(null);
-  const [rect, setRect] = useState<DOMRect | null>(null);
-  const [inside, setInside] = useState(false);
-  const [focused, setFocused] = useState(editor.isFocused);
-
-  useEffect(() => {
-    const f = () => setFocused(true), b = () => setFocused(false);
-    editor.on("focus", f); editor.on("blur", b);
-    return () => { editor.off("focus", f); editor.off("blur", b); };
-  }, [editor]);
-
-  useEffect(() => {
-    if (!target) { setRect(null); return; }
-    let frame = 0;
-    const update = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(() => {
-      const dom = editor.view.nodeDOM(target.pos) as HTMLElement | null;
-      setRect(dom?.getBoundingClientRect ? dom.getBoundingClientRect() : null);
-    }); };
-    update();
-    editor.on("transaction", update);
-    window.addEventListener("scroll", update, true); window.addEventListener("resize", update);
-    return () => { cancelAnimationFrame(frame); editor.off("transaction", update); window.removeEventListener("scroll", update, true); window.removeEventListener("resize", update); };
-  }, [editor, target?.pos, target?.node]);
-
-  if (!target || !rect || !(focused || inside)) return null;
-  const { pos, node } = target;
+/** Cài đặt của khối bố cục (cột, nhóm, hộp lưu ý, nút, nhúng) — dùng ở thanh nổi và ở tab "Khối". null = loại khối khác. */
+export function LayoutSettings({ editor, pos, node, t, anchor }: { editor: TiptapEditor; pos: number; node: PMNode; t: EditorLabels; anchor?(): { left: number; top: number; bottom: number } | undefined }) {
   const a = node.attrs as Record<string, any>;
   const set = (attrs: Record<string, unknown>) => {
-    const n = editor.state.doc.nodeAt(pos);
-    if (n) editor.view.dispatch(editor.state.tr.setNodeMarkup(pos, undefined, { ...n.attrs, ...attrs }));
+    const tr = setBlockAttrs(editor.state, pos, attrs);
+    if (tr) editor.view.dispatch(tr);
   };
-  const anchor = () => { const r = ref.current?.getBoundingClientRect(); return r ? { left: r.left, top: r.top, bottom: r.bottom } : undefined; };
 
   let body: ReactNode = null;
   switch (node.type.name) {
@@ -176,7 +153,7 @@ export function BlockSettingsBar({ editor, t }: { editor: TiptapEditor; t: Edito
         <Seg label={t.tone} value={a.tone ?? "info"} onChange={(v) => set({ tone: v })}
           options={[["info", t.toneInfo, t.toneInfo], ["success", t.toneSuccess, t.toneSuccess], ["warning", t.toneWarning, t.toneWarning], ["danger", t.toneDanger, t.toneDanger]]} />
         <button type="button" className="cms-ed-text-btn" onMouseDown={(e) => e.preventDefault()} onClick={async () => {
-          const r = await askOf(editor)({ title: t.calloutTitle, anchor: anchor(), fields: [{ key: "v", label: t.calloutTitle, value: a.title ?? "" }] });
+          const r = await askOf(editor)({ title: t.calloutTitle, anchor: anchor?.(), fields: [{ key: "v", label: t.calloutTitle, value: a.title ?? "" }] });
           if (r && r !== "remove") set({ title: String(r.v).trim() || null });
         }}>{t.calloutTitle}</button>
       </>;
@@ -202,12 +179,47 @@ export function BlockSettingsBar({ editor, t }: { editor: TiptapEditor; t: Edito
       break;
   }
 
+  return body;
+}
+
+export const LAYOUT_TYPES = TYPES;
+
+export function BlockSettingsBar({ editor, t }: { editor: TiptapEditor; t: EditorLabels }) {
+  const target = useEditorState({ editor, selector: ({ editor: e }) => settingsTarget(e.state), equalityFn: (a, b) => a?.pos === b?.pos && a?.node === b?.node });
+  const ref = useRef<HTMLDivElement>(null);
+  const [rect, setRect] = useState<DOMRect | null>(null);
+  const [inside, setInside] = useState(false);
+  const [focused, setFocused] = useState(editor.isFocused);
+
+  useEffect(() => {
+    const f = () => setFocused(true), b = () => setFocused(false);
+    editor.on("focus", f); editor.on("blur", b);
+    return () => { editor.off("focus", f); editor.off("blur", b); };
+  }, [editor]);
+
+  useEffect(() => {
+    if (!target) { setRect(null); return; }
+    let frame = 0;
+    const update = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(() => {
+      const dom = editor.view.nodeDOM(target.pos) as HTMLElement | null;
+      setRect(dom?.getBoundingClientRect ? dom.getBoundingClientRect() : null);
+    }); };
+    update();
+    editor.on("transaction", update);
+    window.addEventListener("scroll", update, true); window.addEventListener("resize", update);
+    return () => { cancelAnimationFrame(frame); editor.off("transaction", update); window.removeEventListener("scroll", update, true); window.removeEventListener("resize", update); };
+  }, [editor, target?.pos, target?.node]);
+
+  if (!target || !rect || !(focused || inside)) return null;
+  // Có tab "Khối" (BlockInspector) → cài đặt nằm ở đó, không hiện thanh nổi
+  if (((editor.storage as any).cmsEditorContext?.inspector ?? 0) > 0) return null;
+  const anchor = () => { const r = ref.current?.getBoundingClientRect(); return r ? { left: r.left, top: r.top, bottom: r.bottom } : undefined; };
   const top = rect.top - 44 < 8 ? rect.top + 6 : rect.top - 44;
   return createPortal(
     <div ref={ref} role="toolbar" aria-label={t.blockSettings} className="cms-ed-bar" style={{ top, left: Math.max(8, rect.left) }}
       onFocus={() => setInside(true)} onBlur={(e) => { if (!ref.current?.contains(e.relatedTarget as Node)) setInside(false); }}
       onMouseEnter={() => setInside(true)} onMouseLeave={() => { if (!ref.current?.contains(document.activeElement)) setInside(false); }}>
-      {body}
+      <LayoutSettings editor={editor} pos={target.pos} node={target.node} t={t} anchor={anchor} />
     </div>,
     document.body,
   );

@@ -80,3 +80,14 @@ test("blockNode: content none → atom, blocks → chứa khối", () => {
   assert.equal(blockNode(badge).config.atom, true);
   assert.equal(blockNode(callout).config.content, "block+");
 });
+
+test("registerBlockPanel: thuộc tính plugin thêm vào khối lõi được trình soạn giữ khi mở + lưu", async () => {
+  const { registerBlockPanel, unregisterBlockPanel } = await import("../src/panels");
+  const content = { type: "doc", content: [{ type: "image", attrs: { src: "/a.png", lazy: false } }] };
+  // Chưa khai báo: TipTap bỏ thuộc tính lạ
+  assert.equal(roundTrip(content).saved.blocks[0].data.content[0].attrs.lazy, undefined);
+  registerBlockPanel({ id: "demo/lazy", title: "Lazy", blocks: ["image"], attributes: { lazy: { default: true } }, component: () => null });
+  try {
+    assert.equal(roundTrip(content).saved.blocks[0].data.content[0].attrs.lazy, false);
+  } finally { unregisterBlockPanel("demo/lazy"); }
+});

@@ -6,6 +6,7 @@ import type { ComponentType, ReactNode } from "react";
 import { registerEditorExtension, unregisterEditorExtension } from "./registry";
 import { cx } from "./util";
 import { markContainer } from "./blockops";
+import { insertBlock } from "./insert";
 
 /** Props của phần xem trước tuỳ chỉnh trong trình soạn (tuỳ chọn — mặc định trình soạn tự hiển thị). */
 export interface BlockEditProps {
@@ -26,6 +27,16 @@ export interface RegisterBlockOptions {
 }
 
 const blocks = new Map<string, BlockDefinition>();
+const options = new Map<string, RegisterBlockOptions>();
+
+/** Tên (đã dịch) + biểu tượng của khối plugin — cho trình chèn, cây khối, tab "Khối". */
+export function pluginBlockInfo(name: string): { title: string; description?: string; icon: LucideIcon; def: BlockDefinition; translate(s: string): string } | null {
+  const def = blocks.get(name);
+  if (!def) return null;
+  const o = options.get(name) ?? {};
+  const t = o.translate ?? ((x: string) => x);
+  return { title: t(def.title), description: def.description ? t(def.description) : undefined, icon: o.icon ?? Blocks, def, translate: t };
+}
 
 /** Khối đang đăng ký (để chuẩn hoá + nâng phiên bản khi mở bài: contentToEditor). */
 export const registeredBlocks = (): BlockDefinition[] => [...blocks.values()];
@@ -42,12 +53,16 @@ function controlOf(spec: BlockAttrSpec): NonNullable<BlockAttrSpec["control"]> {
   }
 }
 
-/** Form cài đặt sinh từ attributes của khối. */
-function Settings({ def, attrs, setAttrs, t }: { def: BlockDefinition; attrs: Record<string, any>; setAttrs(a: Record<string, unknown>): void; t(s: string): string }) {
+/** Form cài đặt sinh từ attributes của khối (trong khối, hoặc ở tab "Khối" khi ứng dụng có BlockInspector). */
+export function BlockAttributesForm(props: { def: BlockDefinition; attrs: Record<string, any>; setAttrs(a: Record<string, unknown>): void; t(s: string): string; stacked?: boolean }) {
+  return <Settings {...props} />;
+}
+
+function Settings({ def, attrs, setAttrs, t, stacked }: { def: BlockDefinition; attrs: Record<string, any>; setAttrs(a: Record<string, unknown>): void; t(s: string): string; stacked?: boolean }) {
   const fields = Object.entries(def.attributes).filter(([, spec]) => controlOf(spec) !== "hidden");
   if (!fields.length) return null;
   return (
-    <div className="cms-ed-block-settings" contentEditable={false}>
+    <div className={cx("cms-ed-block-settings", stacked && "is-stacked")} contentEditable={false}>
       {fields.map(([key, spec]) => {
         const control = controlOf(spec);
         const value = attrs[key] ?? spec.default ?? "";
@@ -87,11 +102,13 @@ export function blockNode(def: BlockDefinition, opts: RegisterBlockOptions = {})
   function View({ node, selected, updateAttributes, editor, getPos }: ReactNodeViewProps) {
     const attrs = node.attrs as Record<string, any>;
     // Form cài đặt hiện khi khối được chọn hoặc con trỏ đang ở bên trong khối
-    const inside = useEditorState({ editor, selector: ({ editor: e }) => {
+    const { inside, inspector } = useEditorState({ editor, selector: ({ editor: e }) => {
       const pos = getPos();
-      if (typeof pos !== "number") return false;
+      // Ứng dụng có tab "Khối" (BlockInspector đang hiện) → form cài đặt nằm ở đó, không lặp trong khối
+      const inspector = ((e.storage as any).cmsEditorContext?.inspector ?? 0) > 0;
+      if (typeof pos !== "number") return { inside: false, inspector };
       const { from, to } = e.state.selection;
-      return from >= pos && to <= pos + node.nodeSize;
+      return { inside: from >= pos && to <= pos + node.nodeSize, inspector };
     } });
     const active = selected || inside;
     const selectBlock = (e: { preventDefault(): void }) => { e.preventDefault(); const pos = getPos(); if (typeof pos === "number") editor.commands.setNodeSelection(pos); };
@@ -101,7 +118,7 @@ export function blockNode(def: BlockDefinition, opts: RegisterBlockOptions = {})
       <NodeViewWrapper className={cx("cms-ed-block", "cms-ed-plugin-block", active && "is-selected")} data-block={def.name}>
         <div className="cms-ed-block-label" contentEditable={false} data-drag-handle onMouseDown={selectBlock}><Icon size={12} /> {t(def.title)}</div>
         {opts.edit ? <opts.edit attrs={attrs} setAttrs={setAttrs} selected={active}>{inner}</opts.edit> : inner}
-        {active && <Settings def={def} attrs={attrs} setAttrs={setAttrs} t={t} />}
+        {active && !inspector && <Settings def={def} attrs={attrs} setAttrs={setAttrs} t={t} />}
       </NodeViewWrapper>
     );
   }
@@ -133,6 +150,7 @@ export function blockNode(def: BlockDefinition, opts: RegisterBlockOptions = {})
 export function registerBlock(def: BlockDefinition, opts: RegisterBlockOptions = {}) {
   const t = opts.translate ?? ((s: string) => s);
   blocks.set(def.name, def);
+  options.set(def.name, opts);
   registerEditorExtension({
     name: `block:${def.name}`,
     extensions: [blockNode(def, opts)],
@@ -140,10 +158,10 @@ export function registerBlock(def: BlockDefinition, opts: RegisterBlockOptions =
       key: `block:${def.name}`, title: t(def.title), hint: def.description ? t(def.description) : def.name, icon: opts.icon ?? Blocks,
       keywords: `${def.keywords} ${def.name.replace(/[/_-]/g, " ")}`.toLowerCase(),
       run: (editor, range) => {
-        const c = range ? editor.chain().focus().deleteRange(range) : editor.chain().focus();
+        if (range) editor.chain().focus().deleteRange(range).run();
         const node: Record<string, unknown> = { type: def.name, attrs: blockDefaults(def) };
         if (def.content === "blocks") node.content = [{ type: "paragraph" }];
-        c.insertContent(node).run();
+        insertBlock(editor, node);
       },
     }],
   });
@@ -151,5 +169,6 @@ export function registerBlock(def: BlockDefinition, opts: RegisterBlockOptions =
 
 export function unregisterBlock(name: string) {
   blocks.delete(name);
+  options.delete(name);
   unregisterEditorExtension(`block:${name}`);
 }
