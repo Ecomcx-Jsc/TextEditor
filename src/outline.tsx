@@ -31,7 +31,7 @@ function selectBlock(editor: TiptapEditor, item: BlockTreeItem, focus: boolean) 
 }
 
 /**
- * Cây khối của bài (như List View của Gutenberg): khối lồng trong cột / nhóm / hộp lưu ý thụt vào; bấm để chọn,
+ * Cây khối của bài: khối lồng trong cột / nhóm / hộp lưu ý thụt vào; bấm để chọn,
  * kéo thả để đổi chỗ (cả vào / ra khỏi vùng chứa), mũi tên lên/xuống để đi, ←/→ để thu/mở, Enter để vào khối.
  */
 export function BlockTree({ editor, labels }: { editor: TiptapEditor; labels?: Partial<EditorLabels> }) {

@@ -149,7 +149,7 @@ export function moveBlockTo(state: EditorState, from: number, to: number): Trans
 
 export interface BlockTreeItem { pos: number; node: PMNode; depth: number; children: BlockTreeItem[] }
 
-/** Cây khối của tài liệu: khối trong vùng chứa (doc, cột trong bộ cột, nhóm…) — như "List View" của Gutenberg. */
+/** Cây khối của tài liệu: khối trong vùng chứa (doc, cột trong bộ cột, nhóm…). */
 export function blockTree(doc: PMNode): BlockTreeItem[] {
   const walk = (parent: PMNode, start: number, depth: number): BlockTreeItem[] => {
     const out: BlockTreeItem[] = [];

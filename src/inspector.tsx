@@ -14,7 +14,7 @@ import { labelsOf } from "./nodes";
 import { cx } from "./util";
 
 /**
- * Tab "Khối" (như Block Inspector của Gutenberg): cài đặt của khối đang chọn, đường dẫn khối cha (bấm để chọn khối cha),
+ * Tab "Khối": cài đặt của khối đang chọn, đường dẫn khối cha (bấm để chọn khối cha),
  * thao tác lên / xuống / nhân bản / xoá. Khi đang hiện, form cài đặt trong khối plugin và thanh cài đặt nổi được ẩn (tránh lặp).
  * Ứng dụng đặt component này ở thanh bên, truyền đối tượng TipTap nhận từ `onReady` của Editor.
  */

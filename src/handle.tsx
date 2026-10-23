@@ -26,7 +26,7 @@ export function runBlockAction(editor: TiptapEditor, action: BlockAction, block 
   return true;
 }
 
-/** Phím tắt thao tác khối + Alt+F10 mở menu khối (như Gutenberg). */
+/** Phím tắt thao tác khối + Alt+F10 mở menu khối. */
 export const BlockKeys = Extension.create<{ openMenu(): void }>({
   name: "cmsBlockKeys",
   addOptions: () => ({ openMenu: () => {} }),

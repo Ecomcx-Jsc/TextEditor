@@ -1,3 +1,5 @@
+@import "@cms/content/style.css";
+
 /*
  * @cms/editor — CSS độc lập (không cần Tailwind). Đổi màu bằng biến trên .cms-editor (hoặc thẻ cha):
  *   --cms-ed-bg, --cms-ed-panel, --cms-ed-fg, --cms-ed-muted, --cms-ed-faint, --cms-ed-line, --cms-ed-hover,
@@ -40,24 +42,13 @@
 .cms-ed-slash-hint { display: block; font-size: 11px; color: var(--cms-ed-faint); }
 .cms-ed-slash-empty { padding: 12px 8px; text-align: center; font-size: 12px; color: var(--cms-ed-muted); }
 
-/* Nội dung */
-.cms-ed-content { min-height: 50vh; padding: 16px 0 96px; outline: none; font-size: 15px; line-height: 1.75; }
+/* Nội dung — giao diện nền dùng chung với website (@cms/content/style.css, class ecx-content); ở đây chỉ phần riêng của trình soạn */
+.cms-ed-content { min-height: 50vh; padding: 16px 0 96px; outline: none; font-size: 15px; line-height: 1.75;
+  --ecx-border: var(--cms-ed-line); --ecx-muted: var(--cms-ed-muted); --ecx-accent: var(--cms-ed-accent); --ecx-surface: var(--cms-ed-hover); --ecx-code-bg: var(--cms-ed-code-bg); }
 .cms-ed-content > * + * { margin-top: .85em; }
 .cms-ed-content h2 { margin-top: 2rem; font-size: 1.5rem; font-weight: 600; letter-spacing: -.01em; }
 .cms-ed-content h3 { margin-top: 1.5rem; font-size: 1.25rem; font-weight: 600; }
 .cms-ed-content h4 { margin-top: 1.25rem; font-size: 1.125rem; font-weight: 600; }
-.cms-ed-content ul { list-style: disc; padding-left: 1.5rem; }
-.cms-ed-content ol { list-style: decimal; padding-left: 1.5rem; }
-.cms-ed-content li > p { margin: 0; }
-.cms-ed-content blockquote { border-left: 3px solid var(--cms-ed-accent); padding-left: 1rem; color: var(--cms-ed-muted); }
-.cms-ed-content pre { border-radius: 8px; background: var(--cms-ed-code-bg); color: #f4f4f5; padding: 1rem; font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; overflow-x: auto; }
-.cms-ed-content pre code { background: none; padding: 0; }
-.cms-ed-content code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .9em; }
-.cms-ed-content a { color: var(--cms-ed-accent); text-decoration: underline; text-underline-offset: 2px; }
-.cms-ed-content hr { margin: 2rem 0; border: 0; border-top: 1px solid var(--cms-ed-line); }
-.cms-ed-content table { width: 100%; border-collapse: collapse; font-size: 14px; }
-.cms-ed-content td, .cms-ed-content th { border: 1px solid var(--cms-ed-line); padding: 6px 10px; vertical-align: top; }
-.cms-ed-content th { background: var(--cms-ed-hover); font-weight: 600; }
 .cms-ed-content .selectedCell { background: var(--cms-ed-accent-soft); }
 .cms-ed-content p.is-empty::before, .cms-ed-content h2.is-empty::before, .cms-ed-content h3.is-empty::before, .cms-ed-content h4.is-empty::before {
   content: attr(data-placeholder); float: left; height: 0; pointer-events: none; color: var(--cms-ed-faint); }

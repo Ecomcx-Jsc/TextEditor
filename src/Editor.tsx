@@ -354,7 +354,7 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
     onUpdate: ({ editor: e }) => onChange(unwrapUnknown(e.getJSON() as any)),
     editorProps: {
       // Vùng soạn là ô nhập nhiều dòng có tên (axe: aria-input-field-name)
-      attributes: { class: "cms-ed-content", role: "textbox", "aria-multiline": "true", "aria-label": ariaLabel ?? t.editorLabel },
+      attributes: { class: "cms-ed-content ecx-content", role: "textbox", "aria-multiline": "true", "aria-label": ariaLabel ?? t.editorLabel },
       // Dán từ Word / Google Docs: bỏ style, font, màu, thẻ Office; danh sách Word thành danh sách thật
       transformPastedHTML: (html) => cleanPastedHtml(html),
       // Dán một đường dẫn của nhà cung cấp hỗ trợ vào dòng trống → khối nhúng

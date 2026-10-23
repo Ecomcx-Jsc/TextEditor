@@ -66,7 +66,7 @@ export function handleInsertDrop(editor: TiptapEditor, view: EditorView, event: 
   return true;
 }
 
-/** Trình chèn khối (cột trái, như Block Inserter của Gutenberg): tìm, bấm để chèn, kéo vào bài. */
+/** Trình chèn khối (cột trái): tìm, bấm để chèn, kéo vào bài. */
 export function BlockInserter({ editor, labels }: { editor: TiptapEditor; labels?: Partial<EditorLabels> }) {
   const t = { ...viLabels, ...labelsOf(editor), ...labels };
   const [query, setQuery] = useState("");

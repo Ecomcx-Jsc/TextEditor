@@ -34,7 +34,7 @@ const listeners = new Set<() => void>();
 let snapshot: BlockPanel[] = [];
 const changed = () => { snapshot = [...panels.values()].sort((a, b) => (a.order ?? 10) - (b.order ?? 10)); listeners.forEach((l) => l()); };
 
-/** Thêm panel vào tab "Khối" (BlockInspector) cho một số loại khối hoặc mọi khối — như InspectorControls của Gutenberg. */
+/** Thêm panel vào tab "Khối" (BlockInspector) cho một số loại khối hoặc mọi khối. */
 export function registerBlockPanel(panel: BlockPanel) {
   panels.set(panel.id, panel);
   if (panel.attributes && panel.blocks?.length) {
