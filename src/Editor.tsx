@@ -6,7 +6,7 @@ import { NodeSelection } from "@tiptap/pm/state";
 import Suggestion, { type SuggestionProps } from "@tiptap/suggestion";
 import {
   AlignCenter, AlignLeft, AlignRight, Bold, Braces, Code, FileText, Heading2, Heading3, Heading4, ImageIcon, Images, Italic, Link2, List,
-  ListOrdered, Maximize2, Minus, Music, Pilcrow, Quote, Redo2, SquareCode, Strikethrough, Table2, Underline, Undo2, Video, type LucideIcon,
+  ListOrdered, Minus, Music, Pilcrow, Quote, Redo2, SquareCode, Strikethrough, Table2, Underline, Undo2, Video, type LucideIcon,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { createPortal } from "react-dom";
@@ -23,6 +23,7 @@ export { rankItems } from "./rank";
 import { AskPopover, askOf, createAskStore, type Ask } from "./ask";
 import { BlockHandle, BlockKeys } from "./handle";
 import { BlockSettingsBar, layoutItems } from "./layoutUi";
+import { BlockToolbar } from "./toolbar";
 import { cleanPastedHtml, isUrl } from "./paste";
 import { handleInsertDrop } from "./inserter";
 import { embedInfo } from "@cms/content";
@@ -253,42 +254,6 @@ function SelectionMenu({ editor, t }: { editor: TiptapEditor; t: EditorLabels })
   );
 }
 
-/** Menu khi chọn ảnh: cỡ, căn lề, alt, chú thích, thay ảnh, về cỡ gốc (kéo góc ảnh để đổi kích thước). */
-function ImageMenu({ editor, t, media, requestMedia }: { editor: TiptapEditor; t: EditorLabels; media?: MediaProvider; requestMedia: RequestMedia }) {
-  const attrs = useEditorState({ editor, selector: ({ editor: e }) => (e.isActive("image") ? { ...e.getAttributes("image") } : null) });
-  const set = (a: Record<string, unknown>) => editor.chain().focus().updateAttributes("image", a).run();
-  async function resize(size: string) {
-    if (!attrs?.mediaId || !media?.get) return set({ size });
-    const m = await media.get(attrs.mediaId).catch(() => null);
-    set(m ? { ...imageAttrs(m, size), alt: attrs.alt, caption: attrs.caption, align: attrs.align } : { size });
-  }
-  const aligns: Array<[string | null, LucideIcon, string]> = [["left", AlignLeft, t.floatLeft], [null, AlignCenter, t.center], ["right", AlignRight, t.floatRight], ["wide", Maximize2, t.wide]];
-  return (
-    <BubbleMenu editor={editor} shouldShow={({ editor: e }) => e.isActive("image")} className="cms-ed-bubble">
-      {attrs && <>
-        {attrs.mediaId != null && media?.get && (
-          <select className="cms-ed-select" value={attrs.size ?? "large"} onChange={(e) => resize(e.target.value)} title={t.size}>
-            {([["medium", t.sizeMedium], ["medium_large", t.sizeMediumLarge], ["large", t.sizeLarge], ["full", t.sizeFull]] as const).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-          </select>
-        )}
-        <Sep />
-        {aligns.map(([v, Icon, title]) => <Btn key={title} title={title} active={(attrs.align ?? null) === v} onClick={() => set({ align: v })}><Icon size={16} /></Btn>)}
-        <Sep />
-        <button type="button" className="cms-ed-text-btn" onClick={async () => {
-          const r = await askOf(editor)({ title: t.alt, fields: [{ key: "v", label: t.altPrompt, type: "textarea", value: attrs.alt ?? "" }] });
-          if (r && r !== "remove") set({ alt: String(r.v) });
-        }}>{t.alt}</button>
-        <button type="button" className="cms-ed-text-btn" onClick={async () => {
-          const r = await askOf(editor)({ title: t.caption, fields: [{ key: "v", label: t.captionPrompt, type: "textarea", value: attrs.caption ?? "" }] });
-          if (r && r !== "remove") set({ caption: String(r.v) || null });
-        }}>{t.caption}</button>
-        <button type="button" className="cms-ed-text-btn" onClick={() => requestMedia(editor, "image")}>{t.replace}</button>
-        {attrs.mediaId != null && media?.get && <button type="button" className="cms-ed-text-btn" onClick={() => resize(attrs.size ?? "large")}>{t.resetSize}</button>}
-      </>}
-    </BubbleMenu>
-  );
-}
-
 /** Đếm từ / ký tự / thời gian đọc (200 từ mỗi phút) — dưới vùng soạn. */
 function Stats({ editor, t }: { editor: TiptapEditor; t: EditorLabels }) {
   const s = useEditorState({ editor, selector: ({ editor: e }) => {
@@ -385,6 +350,7 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
     if (!editor) return;
     const ctx = (editor.storage as any).cmsEditorContext as { labels: EditorLabels; ask: Ask };
     ctx.labels = t; ctx.ask = asker.ask;
+    (ctx as any).setLink = () => setLink(editor, t);
     onReady?.(editor);
   }, [editor, t]);
   // Lệnh chèn (gồm khối plugin) cho trình chèn ở ngoài trình soạn (BlockInserter); giao dịch rỗng để nó đọc lại
@@ -398,12 +364,12 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
     <div className={cx("cms-editor", className)}>
       {editor && <div className={cx("cms-ed-toolbar", toolbarClassName)}><Toolbar editor={editor} t={t} requestMedia={requestMedia} items={items} /></div>}
       {editor && <SelectionMenu editor={editor} t={t} />}
-      {editor && <ImageMenu editor={editor} t={t} media={media} requestMedia={requestMedia} />}
       <EditorContent editor={editor} />
       <SlashMenu store={slash} t={t} />
       {editor && <BlockHandle editor={editor} t={t} menuRequest={menuRequest} />}
       {editor && <AskPopover store={asker} editor={editor} t={t} />}
       {editor && <BlockSettingsBar editor={editor} t={t} />}
+      {editor && <BlockToolbar editor={editor} t={t} media={media} requestMedia={requestMedia} />}
       {editor && <Stats editor={editor} t={t} />}
     </div>
   );

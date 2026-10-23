@@ -3,7 +3,7 @@ import { NodeSelection } from "@tiptap/pm/state";
 import { ArrowDown, ArrowUp, Copy, CornerLeftUp, GripVertical, Plus, Trash2, type LucideIcon } from "lucide-react";
 import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent } from "react";
 import { createPortal } from "react-dom";
-import { blockFromPos, currentBlock, deleteBlock, duplicateBlock, insertParagraphAfter, moveBlock, parentBlock, type BlockRef } from "./blockops";
+import { blockFromPos, currentBlock, deleteBlock, duplicateBlock, insertParagraphAfter, insertParagraphBefore, moveBlock, parentBlock, type BlockRef } from "./blockops";
 import type { EditorLabels } from "./labels";
 import { cx } from "./util";
 
@@ -11,7 +11,7 @@ const mac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator
 const key = (s: string) => (mac ? s.replace("Mod", "⌘").replace("Shift", "⇧").replace("Alt", "⌥").replace(/-/g, "") : s.replace("Mod", "Ctrl").replace(/-/g, "+"));
 
 /** Thao tác khối theo phím tắt (cùng chỗ với menu khối). */
-export type BlockAction = "up" | "down" | "duplicate" | "delete" | "parent" | "insert";
+export type BlockAction = "up" | "down" | "duplicate" | "delete" | "parent" | "insert" | "insertBefore";
 
 export function runBlockAction(editor: TiptapEditor, action: BlockAction, block = currentBlock(editor.state)): boolean {
   if (!block) return false;
@@ -19,6 +19,7 @@ export function runBlockAction(editor: TiptapEditor, action: BlockAction, block 
   const tr = action === "up" ? moveBlock(state, block, -1) : action === "down" ? moveBlock(state, block, 1)
     : action === "duplicate" ? duplicateBlock(state, block) : action === "delete" ? deleteBlock(state, block)
     : action === "insert" ? insertParagraphAfter(state, block)
+    : action === "insertBefore" ? insertParagraphBefore(state, block)
     : (() => { const p = parentBlock(state.doc, block); return p ? state.tr.setSelection(NodeSelection.create(state.doc, p.pos)) : null; })();
   if (!tr) return false;
   editor.view.dispatch(tr);
@@ -40,6 +41,22 @@ export const BlockKeys = Extension.create<{ openMenu(): void }>({
     };
   },
 });
+
+/** Bắt đầu kéo một khối (tay kéo bên trái, nút kéo trên thanh công cụ khối): ProseMirror tự thả + xoá bản gốc. */
+export function startBlockDrag(editor: TiptapEditor, block: BlockRef, e: DragEvent) {
+  const view = editor.view;
+  const sel = NodeSelection.create(view.state.doc, block.pos);
+  view.dispatch(view.state.tr.setSelection(sel));
+  const slice = sel.content();
+  const { dom, text } = view.serializeForClipboard(slice);
+  e.dataTransfer.clearData();
+  e.dataTransfer.setData("text/html", dom.innerHTML);
+  e.dataTransfer.setData("text/plain", text);
+  e.dataTransfer.effectAllowed = "copyMove";
+  const el = view.nodeDOM(block.pos) as HTMLElement | null;
+  if (el) e.dataTransfer.setDragImage(el, 0, 0);
+  (view as any).dragging = { slice, move: true, node: sel };
+}
 
 type Shown = { block: BlockRef; rect: DOMRect };
 
@@ -137,19 +154,7 @@ export function BlockHandle({ editor, t, menuRequest }: { editor: TiptapEditor; 
   }
 
   function onDragStart(e: DragEvent) {
-    const view = editor.view;
-    const sel = NodeSelection.create(view.state.doc, block.pos);
-    view.dispatch(view.state.tr.setSelection(sel));
-    const slice = sel.content();
-    const { dom, text } = view.serializeForClipboard(slice);
-    e.dataTransfer.clearData();
-    e.dataTransfer.setData("text/html", dom.innerHTML);
-    e.dataTransfer.setData("text/plain", text);
-    e.dataTransfer.effectAllowed = "copyMove";
-    const el = view.nodeDOM(block.pos) as HTMLElement | null;
-    if (el) e.dataTransfer.setDragImage(el, 0, 0);
-    // ProseMirror tự thả + xoá bản gốc (giống kéo một khối đang chọn)
-    (view as any).dragging = { slice, move: true, node: sel };
+    startBlockDrag(editor, block, e);
     setMenu(false);
   }
 

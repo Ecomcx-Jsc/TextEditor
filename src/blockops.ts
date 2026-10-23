@@ -110,6 +110,11 @@ export function insertParagraphAfter(state: EditorState, block: BlockRef): Trans
   return tr.setSelection(TextSelection.create(tr.doc, after + 1)).scrollIntoView();
 }
 
+export function insertParagraphBefore(state: EditorState, block: BlockRef): Transaction {
+  const tr = state.tr.insert(block.pos, state.schema.nodes.paragraph.create());
+  return tr.setSelection(TextSelection.create(tr.doc, block.pos + 1)).scrollIntoView();
+}
+
 /**
  * Chuyển khối ở `from` tới vị trí `to` (vị trí giữa hai khối, theo tài liệu hiện tại) — dùng cho kéo thả trong cây khối.
  * null khi không hợp lệ: thả vào chính nó / bên trong nó, hoặc chỗ đến không nhận loại khối này (vd cột chỉ nằm trong bộ cột).

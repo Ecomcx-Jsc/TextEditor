@@ -42,6 +42,10 @@ const { main, others } = contentToEditor(saved);
 
 Không truyền `media` → chèn ảnh/video bằng URL.
 
+## Thanh công cụ khối (1.8)
+
+Bấm vào khối → thanh nổi phía trên khối: loại khối (đoạn văn, tiêu đề, danh sách, trích dẫn, khối mã — bấm để đổi loại), kéo, lên/xuống, nút riêng theo khối (căn chữ, thụt danh sách, đậm/nghiêng/liên kết, ảnh: cỡ/căn lề/alt/chú thích/thay ảnh, bảng: thêm/bớt hàng cột/hàng tiêu đề/xoá), menu ⋮ (thêm khối phía trên/dưới, nhân bản, chọn khối cha, xoá). Ẩn khi đang gõ, hiện lại khi rê chuột hoặc bấm. `role="toolbar"`, class `cms-ed-blockbar`.
+
 ## Khối động (1.7)
 
 ```tsx
