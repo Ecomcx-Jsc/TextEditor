@@ -35,6 +35,8 @@ export function BlockInspector({ editor, labels, device: deviceProp, onDeviceCha
   const [ownDevice, setOwnDevice] = useState<Device>("base");
   const device = deviceProp ?? ownDevice;
   const changeDevice = (d: Device) => { setOwnDevice(d); onDeviceChange?.(d); };
+  // Kéo khoảng đệm trên khung ghi vào khổ đang sửa
+  useEffect(() => { (editor.storage as any).cmsEditorContext.device = device; }, [editor, device]);
 
   // Báo cho trình soạn biết đang có tab "Khối" (ẩn form trong khối + thanh nổi); giao dịch rỗng để các khung vẽ lại
   useEffect(() => {

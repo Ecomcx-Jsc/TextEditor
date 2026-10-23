@@ -68,6 +68,10 @@ Có sẵn ở mọi trình soạn (`registerBasicBlocks("en")` để đổi nhã
 
 Bấm vào khối → thanh nổi phía trên khối: loại khối (đoạn văn, tiêu đề, danh sách, trích dẫn, khối mã — bấm để đổi loại), kéo, lên/xuống, nút riêng theo khối (căn chữ, thụt danh sách, đậm/nghiêng/liên kết, ảnh: cỡ/căn lề/alt/chú thích/thay ảnh, bảng: thêm/bớt hàng cột/hàng tiêu đề/xoá), menu ⋮ (thêm khối phía trên/dưới, nhân bản, chọn khối cha, xoá). Ẩn khi đang gõ, hiện lại khi rê chuột hoặc bấm. `role="toolbar"`, class `cms-ed-blockbar`.
 
+## Kéo chỉnh trên khung (1.14)
+
+Con trỏ trong bộ cột → thanh kéo ở khe giữa hai cột đổi độ rộng (`column.width`, %). Chọn cả khối bố cục (nhóm, ảnh bìa, bộ cột, cột, hộp lưu ý, ảnh + chữ, thu gọn, trích dẫn nổi bật) → kéo 4 cạnh đổi khoảng đệm, ghi vào `style.padding` theo từng cạnh ở khổ đang chọn trong tab Kiểu dáng (máy tính → `base`, máy tính bảng / điện thoại → `tablet` / `mobile`). Class `cms-ed-colhandle`, `cms-ed-padhandle`.
+
 ## Khối động (1.7)
 
 ```tsx

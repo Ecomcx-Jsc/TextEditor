@@ -5,7 +5,7 @@
  *   --cms-ed-bg, --cms-ed-panel, --cms-ed-fg, --cms-ed-muted, --cms-ed-faint, --cms-ed-line, --cms-ed-hover,
  *   --cms-ed-accent, --cms-ed-accent-soft, --cms-ed-accent-fg, --cms-ed-danger, --cms-ed-code-bg, --cms-ed-font
  */
-:where(.cms-editor, .cms-ed-slash, .cms-ed-bubble, .cms-ed-ask, .cms-ed-handle, .cms-ed-bar, .cms-ed-blockbar, .cms-ed-inspector, .cms-ed-inserter, .cms-ed-outline) {
+:where(.cms-editor, .cms-ed-slash, .cms-ed-bubble, .cms-ed-ask, .cms-ed-handle, .cms-ed-bar, .cms-ed-blockbar, .cms-ed-handles, .cms-ed-inspector, .cms-ed-inserter, .cms-ed-outline) {
   /* :where → độ ưu tiên 0: ứng dụng nhúng ghi đè được dù CSS này nạp sau */
   --cms-ed-panel: #fff; --cms-ed-fg: #18181b; --cms-ed-muted: #71717a; --cms-ed-faint: #a1a1aa; --cms-ed-line: #e4e4e7;
   --cms-ed-hover: #f4f4f5; --cms-ed-accent: #4f46e5; --cms-ed-accent-soft: #eef2ff; --cms-ed-accent-fg: #fff; --cms-ed-danger: #dc2626;
@@ -70,6 +70,15 @@
 .cms-ed-content [data-node="image"] { margin: .5em 0; }
 
 /* Thanh công cụ nổi phía trên khối */
+/* Kéo chỉnh trên khung: độ rộng cột, khoảng đệm */
+.cms-ed-colhandle { position: fixed; z-index: 44; width: 10px; cursor: col-resize; touch-action: none; }
+.cms-ed-colhandle::after { content: ""; position: absolute; left: 4px; top: 0; bottom: 0; width: 2px; border-radius: 1px; background: var(--cms-ed-accent, #2563eb); opacity: .35; transition: opacity .12s; }
+.cms-ed-colhandle:hover::after, .cms-ed-colhandle:active::after { opacity: 1; }
+.cms-ed-padhandle { position: fixed; z-index: 44; touch-action: none; background: repeating-linear-gradient(45deg, var(--cms-ed-accent-soft, #dbeafe) 0 4px, transparent 4px 8px); opacity: .55; transition: opacity .12s; }
+.cms-ed-padhandle:hover, .cms-ed-padhandle:active { opacity: 1; }
+.cms-ed-padhandle.is-top, .cms-ed-padhandle.is-bottom { cursor: ns-resize; }
+.cms-ed-padhandle.is-left, .cms-ed-padhandle.is-right { cursor: ew-resize; }
+.cms-ed-handletip { position: fixed; z-index: 46; transform: translateX(-50%); padding: 2px 6px; border-radius: 4px; font: 500 11px/1.4 var(--cms-ed-font, system-ui); color: var(--cms-ed-accent-fg, #fff); background: var(--cms-ed-accent, #2563eb); pointer-events: none; white-space: nowrap; }
 .cms-ed-blockbar { position: fixed; z-index: 45; display: flex; align-items: center; gap: 2px; padding: 3px; border: 1px solid var(--cms-ed-fg, #18181b);
   border-radius: 8px; background: var(--cms-ed-panel, #fff); color: var(--cms-ed-fg, #18181b); box-shadow: 0 4px 16px rgb(0 0 0 / .12); font-size: 13px; }
 .cms-ed-blockbar-group { display: inline-flex; align-items: center; gap: 2px; }

@@ -24,6 +24,7 @@ import { AskPopover, askOf, createAskStore, type Ask } from "./ask";
 import { BlockHandle, BlockKeys } from "./handle";
 import { BlockSettingsBar, layoutItems } from "./layoutUi";
 import { BlockToolbar } from "./toolbar";
+import { CanvasHandles } from "./handles";
 import { documentStyleCss, presetsCss } from "./styleattr";
 import type { StylePresets } from "@cms/content";
 import { registerBasicBlocks } from "./basic";
@@ -411,6 +412,7 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
       {editor && <AskPopover store={asker} editor={editor} t={t} />}
       {editor && <BlockSettingsBar editor={editor} t={t} />}
       {editor && <BlockToolbar editor={editor} t={t} media={media} requestMedia={requestMedia} />}
+      {editor && <CanvasHandles editor={editor} t={t} />}
       {editor && <Stats editor={editor} t={t} />}
     </div>
   );
