@@ -42,6 +42,10 @@ const { main, others } = contentToEditor(saved);
 
 Không truyền `media` → chèn ảnh/video bằng URL.
 
+## Bảng, mạng xã hội (1.13)
+
+Bảng có `footer` (hàng cuối là chân bảng — `<tfoot>` trên website) và `fixed` (cố định độ rộng cột): nút "Hàng chân bảng" trên thanh công cụ khối, ô tích trong tab Khối. Khối mạng xã hội có `showLabels` (website hiện biểu tượng SVG, bật để kèm tên).
+
 ## Mẫu (1.12)
 
 Trình chèn có tab **Mẫu**: đoạn nội dung dựng sẵn theo nhóm (ảnh bìa, tính năng, kêu gọi hành động, bảng giá, cảm nhận, hỏi đáp, liên hệ…) có xem trước thu nhỏ, tìm không dấu, bấm để chèn (chép khối — sửa tự do). Nguồn: `registerCorePatterns(locale)` (mẫu lõi, dựng bằng bộ khối cơ bản), `registerPattern({ name, title, category, description?, keywords?, content })` (theme / plugin / ứng dụng). `insertPattern(editor, pattern)`, `patternNodes(pattern)`.

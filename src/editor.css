@@ -320,3 +320,7 @@
 .cms-ed-pattern-preview { position: relative; height: 120px; overflow: hidden; border-radius: 6px; background: #fff; color: #18181b; pointer-events: none; }
 .cms-ed-pattern-canvas { position: absolute; top: 0; left: 0; width: 333%; padding: 24px; transform: scale(.3); transform-origin: top left; font-size: 16px; line-height: 1.6; }
 .cms-ed-pattern-title { font-size: 12px; font-weight: 600; }
+
+/* Bảng: chân bảng, cố định độ rộng cột */
+.cms-ed-content table[data-footer] tr:last-child > td { font-weight: 600; background: var(--cms-ed-hover); }
+.cms-ed-content table[data-fixed] { table-layout: fixed; }

@@ -2,7 +2,7 @@ import { getSchema, type AnyExtension } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import TextAlign from "@tiptap/extension-text-align";
 import Youtube from "@tiptap/extension-youtube";
-import { TableKit } from "@tiptap/extension-table";
+import { Table, TableKit } from "@tiptap/extension-table";
 import { TaskItem, TaskList } from "@tiptap/extension-list";
 import Subscript from "@tiptap/extension-subscript";
 import Superscript from "@tiptap/extension-superscript";
@@ -24,7 +24,14 @@ export function coreExtensions(): AnyExtension[] {
     CmsImage, Gallery, VideoNode, AudioNode, FileNode, EditorContext,
     TextAlign.configure({ types: ["heading", "paragraph"] }),
     Youtube.configure({ nocookie: true }),
-    TableKit.configure({ table: { resizable: false } }),
+    TableKit.configure({ table: false }),
+    // Bảng: chân bảng (hàng cuối → <tfoot> trên website) + cố định độ rộng cột
+    Table.extend({
+      addAttributes() {
+        const flag = (name: string) => ({ default: false, parseHTML: (el: HTMLElement) => el.hasAttribute(`data-${name}`), renderHTML: (a: Record<string, unknown>) => (a[name] ? { [`data-${name}`]: "" } : {}) });
+        return { ...this.parent?.(), footer: flag("footer"), fixed: flag("fixed") };
+      },
+    }).configure({ resizable: false }),
     TaskList, TaskItem.configure({ nested: true }),
     Subscript, Superscript, Highlight.configure({ multicolor: true }), TextStyle, Color,
     ...layoutExtensions(),

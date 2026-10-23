@@ -143,7 +143,8 @@ function BlockTools({ editor, block, t, media, requestMedia }: { editor: TiptapE
   if (type === "table") parts.push(
     <span key="table" role="group" aria-label={t.table} className="cms-ed-table-tools">
       {([[t.addRow, () => c().addRowAfter().run()], [t.addCol, () => c().addColumnAfter().run()], [t.delRow, () => c().deleteRow().run()], [t.delCol, () => c().deleteColumn().run()],
-        [t.headerRow, () => c().toggleHeaderRow().run()]] as const).map(([l, f]) => <button key={l} type="button" onMouseDown={(e) => e.preventDefault()} onClick={f}>{l}</button>)}
+        [t.headerRow, () => c().toggleHeaderRow().run()],
+        [t.footerRow, () => c().updateAttributes("table", { footer: !editor.getAttributes("table").footer }).run()]] as const).map(([l, f]) => <button key={l} type="button" onMouseDown={(e) => e.preventDefault()} onClick={f}>{l}</button>)}
       <button type="button" className="is-danger" onMouseDown={(e) => e.preventDefault()} onClick={() => c().deleteTable().run()}>{t.delTable}</button>
     </span>);
   return <>{parts.flatMap((p, i) => (i ? [<Sep key={`s${i}`} />, p] : [p]))}</>;

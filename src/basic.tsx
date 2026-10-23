@@ -16,7 +16,7 @@ const vi: Dict = {
   alt: "Mô tả ảnh (alt)", overlay: "Màu phủ", opacity: "Độ đậm lớp phủ (%)", minHeight: "Cao tối thiểu", contentAlign: "Vị trí nội dung",
   top: "Trên", bottom: "Dưới", fixed: "Ảnh nền đứng yên khi cuộn", position: "Vị trí ảnh", width: "Độ rộng ảnh (%)", verticalAlign: "Căn dọc",
   stack: "Xếp dọc trên điện thoại", citation: "Nguồn trích dẫn", summary: "Tiêu đề (bấm để mở)", open: "Mở sẵn", html: "Mã HTML",
-  size: "Cỡ", small: "Nhỏ", medium: "Vừa", large: "Lớn", title: "Tiêu đề", maxLevel: "Đến cấp tiêu đề",
+  size: "Cỡ", showLabels: "Hiện tên mạng cạnh biểu tượng", small: "Nhỏ", medium: "Vừa", large: "Lớn", title: "Tiêu đề", maxLevel: "Đến cấp tiêu đề",
   pickImage: "Chọn ảnh", replaceImage: "Thay ảnh", removeImage: "Bỏ ảnh", addLink: "Thêm liên kết", service: "Mạng", url: "Đường dẫn",
   htmlHint: "HTML chỉ chạy trên website; người không có quyền HTML không lọc sẽ bị lọc khi lưu.",
   tocHint: "Tự tạo từ các tiêu đề trong bài", summaryPlaceholder: "Bấm để xem thêm",
@@ -28,7 +28,7 @@ const en: Dict = {
   alt: "Alt text", overlay: "Overlay color", opacity: "Overlay opacity (%)", minHeight: "Min height", contentAlign: "Content position",
   top: "Top", bottom: "Bottom", fixed: "Fixed background", position: "Media position", width: "Media width (%)", verticalAlign: "Vertical align",
   stack: "Stack on mobile", citation: "Citation", summary: "Summary (click to open)", open: "Open by default", html: "HTML",
-  size: "Size", small: "Small", medium: "Medium", large: "Large", title: "Title", maxLevel: "Up to heading level",
+  size: "Size", showLabels: "Show names next to icons", small: "Small", medium: "Medium", large: "Large", title: "Title", maxLevel: "Up to heading level",
   pickImage: "Choose image", replaceImage: "Replace image", removeImage: "Remove image", addLink: "Add link", service: "Service", url: "URL",
   htmlHint: "HTML runs only on the website; it is filtered on save for people without the unfiltered HTML permission.",
   tocHint: "Built from the headings in the post", summaryPlaceholder: "Click to read more",
@@ -133,7 +133,7 @@ export function registerBasicBlocks(locale: "vi" | "en" = "vi") {
     ["pullquote", Quote, "inline", { citation: s("citation") }, PullquoteEdit, undefined],
     ["details", ChevronRight, "blocks", { summary: s("summary"), open: b("open", { default: false }) }, detailsEdit(t), undefined],
     ["customHtml", Code2, "none", { html: s("html", { control: "textarea" }) }, htmlEdit(t), undefined],
-    ["socialLinks", Share2, "none", { links: { type: "json", default: [], control: "hidden" }, size: enumOf("size", ["small", "medium", "large"], "medium"), align: enumOf("align", ["left", "center", "right"]) }, socialEdit(t), undefined],
+    ["socialLinks", Share2, "none", { links: { type: "json", default: [], control: "hidden" }, size: enumOf("size", ["small", "medium", "large"], "medium"), align: enumOf("align", ["left", "center", "right"]), showLabels: b("showLabels", { default: false }) }, socialEdit(t), undefined],
     ["tableOfContents", ListTree, "none", { title: s("title"), maxLevel: i("maxLevel", { min: 2, max: 4, default: 3 }) }, tocEdit(t), undefined],
   ];
   for (const [name, icon, content, attributes, edit, initialContent] of specs) {

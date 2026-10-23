@@ -220,13 +220,15 @@ function Settings({ editor, block, t }: { editor: TiptapEditor; block: BlockRef;
     case "video": case "audio": return text("caption", t.caption);
     case "file": return <>{text("caption", t.caption)}{check("embed", t.showPdf, true)}{check("download", t.allowDownload, false)}</>;
     case "youtube": return text("start", t.startAt, { number: true });
-    case "table": return (
+    case "table": return <>
+      {check("footer", t.footerRow, false)}
+      {check("fixed", t.fixedLayout, false)}
       <div className="cms-ed-inspector-row">
         {([[t.addRow, () => editor.chain().focus().addRowAfter().run()], [t.addCol, () => editor.chain().focus().addColumnAfter().run()],
           [t.delRow, () => editor.chain().focus().deleteRow().run()], [t.delCol, () => editor.chain().focus().deleteColumn().run()]] as const)
           .map(([l, f]) => <button key={l} type="button" className="cms-ed-text-btn" onClick={f}>{l}</button>)}
       </div>
-    );
+    </>;
     default: return <p className="cms-ed-inspector-empty">{t.noSettings}</p>;
   }
 }
