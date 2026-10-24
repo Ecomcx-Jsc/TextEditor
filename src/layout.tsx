@@ -1,13 +1,13 @@
 import { Node, mergeAttributes, type Editor } from "@tiptap/core";
 import { NodeViewWrapper, ReactNodeViewRenderer, type ReactNodeViewProps } from "@tiptap/react";
-import { embedInfo } from "@ecomcx/nexus-content";
+import { embedInfo } from "@ecomcx/ecomweb-content";
 import { ExternalLink, Link2 } from "lucide-react";
 import { markContainer } from "./blockops";
 import { labelsOf } from "./nodes";
 import { cx } from "./util";
 
 /**
- * Khối bố cục — khớp CORE_NODES của @ecomcx/nexus-content 1.2: cột (columns > column), nhóm, hộp lưu ý, nút, nhúng theo đường dẫn.
+ * Khối bố cục — khớp CORE_NODES của @ecomcx/ecomweb-content 1.2: cột (columns > column), nhóm, hộp lưu ý, nút, nhúng theo đường dẫn.
  * Cột / nhóm / hộp lưu ý chứa khối khác (khối con có tay kéo + menu riêng); nút và nhúng là khối nguyên, sửa qua thanh cài đặt.
  */
 

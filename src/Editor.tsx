@@ -27,7 +27,7 @@ import { BlockSettingsBar, layoutItems } from "./layoutUi";
 import { BlockToolbar } from "./toolbar";
 import { CanvasHandles } from "./handles";
 import { documentStyleCss, presetsCss } from "./styleattr";
-import type { StylePresets } from "@ecomcx/nexus-content";
+import type { StylePresets } from "@ecomcx/ecomweb-content";
 import { registerBasicBlocks } from "./basic";
 import { registerCorePatterns } from "./patterns";
 import { setImagePicker } from "./blocks";
@@ -37,7 +37,7 @@ registerBasicBlocks();
 registerCorePatterns();
 import { cleanPastedHtml, isUrl } from "./paste";
 import { handleInsertDrop } from "./inserter";
-import { embedInfo } from "@ecomcx/nexus-content";
+import { embedInfo } from "@ecomcx/ecomweb-content";
 
 export interface EditorProps {
   /** Nội dung ban đầu (TipTap JSON hoặc HTML). */
@@ -309,7 +309,7 @@ function Stats({ editor, t }: { editor: TiptapEditor; t: EditorLabels }) {
 // ---------------------------------------------------------------------------
 // Editor
 // ---------------------------------------------------------------------------
-/** Trình soạn nội dung. Dùng kèm CSS: import "@ecomcx/nexus-editor/style.css". */
+/** Trình soạn nội dung. Dùng kèm CSS: import "@ecomcx/ecomweb-editor/style.css". */
 const NO_PACKS: EditorExtensionPack[] = [];
 
 export function Editor({ initial, onChange, media, labels, extensions: localPacks = NO_PACKS, toolbarClassName, className, onReady, ariaLabel, dynamicBlocks = false, presets, patterns }: EditorProps) {

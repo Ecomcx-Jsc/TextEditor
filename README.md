@@ -1,11 +1,11 @@
-# @ecomcx/nexus-editor
+# @ecomcx/ecomweb-editor
 
 Trình soạn thảo nội dung dạng khối dựa trên [TipTap](https://tiptap.dev) — tách khỏi CMS để dùng trong mọi dự án React.
 
 - Đoạn văn, tiêu đề, danh sách, trích dẫn, khối mã, bảng, đường kẻ, YouTube, shortcode
 - Ảnh responsive: srcset JPEG + WebP, **kéo góc để đổi kích thước**, chọn cỡ, căn lề (bao chữ / rộng), alt, chú thích
 - Bộ sưu tập ảnh, video, âm thanh, tệp tải xuống (PDF hiển thị ngay)
-- Khối bố cục (`@ecomcx/nexus-content` ≥ 1.2): cột (2–4, bố cục 50/50, 33/67…, căn dọc, xếp dọc trên điện thoại), nhóm (nền, màu chữ, khoảng đệm), hộp lưu ý (4 kiểu + tiêu đề), nút (chữ, liên kết, kiểu, căn lề), nhúng theo đường dẫn (YouTube, Vimeo, Spotify, SoundCloud, TikTok, X, Instagram, CodePen, Figma, Google Maps… — `embedInfo`); thanh cài đặt khối hiện phía trên khối đang soạn
+- Khối bố cục (`@ecomcx/ecomweb-content` ≥ 1.2): cột (2–4, bố cục 50/50, 33/67…, căn dọc, xếp dọc trên điện thoại), nhóm (nền, màu chữ, khoảng đệm), hộp lưu ý (4 kiểu + tiêu đề), nút (chữ, liên kết, kiểu, căn lề), nhúng theo đường dẫn (YouTube, Vimeo, Spotify, SoundCloud, TikTok, X, Instagram, CodePen, Figma, Google Maps… — `embedInfo`); thanh cài đặt khối hiện phía trên khối đang soạn
 - Dán từ Word / Google Docs sạch (`cleanPastedHtml`: định dạng bằng style → đậm/nghiêng/gạch chân; bỏ font, màu, thẻ Office; danh sách Word thành danh sách thật); dán một đường dẫn hỗ trợ nhúng vào dòng trống → khối nhúng
 - Đếm từ, ký tự, thời gian đọc dưới vùng soạn
 - Bố cục trình dựng cho ứng dụng nhúng (1.5): `BlockInspector` (tab "Khối": đường dẫn khối cha, cài đặt theo loại khối, thao tác), `BlockInserter` (tìm, bấm để chèn, kéo vào bài), `BlockTree` (cây khối: chọn, bàn phím, kéo đổi chỗ kể cả vào/ra vùng chứa) — truyền đối tượng nhận từ `onReady` của `Editor`
@@ -20,15 +20,15 @@ Trình soạn thảo nội dung dạng khối dựa trên [TipTap](https://tipta
 
 ## TipTap đi kèm (vendored)
 
-Trình soạn mang sẵn đúng bản TipTap + ProseMirror đã kiểm thử (`node_modules` của các gói đó được commit, khai báo `bundleDependencies`): cài `@ecomcx/nexus-editor` từ GitHub không tải TipTap từ npm — TipTap có ngừng phát triển hay đổi gói thì mọi CMS vẫn cài và build được. Không phần nào khác import TipTap: plugin dùng `defineBlock` / `registerBlock`; lớp cấp thấp (`Node`, `Mark`, `Extension`, `mergeAttributes`) xuất lại từ `@ecomcx/nexus-editor`.
+Trình soạn mang sẵn đúng bản TipTap + ProseMirror đã kiểm thử (`node_modules` của các gói đó được commit, khai báo `bundleDependencies`): cài `@ecomcx/ecomweb-editor` từ GitHub không tải TipTap từ npm — TipTap có ngừng phát triển hay đổi gói thì mọi CMS vẫn cài và build được. Không phần nào khác import TipTap: plugin dùng `defineBlock` / `registerBlock`; lớp cấp thấp (`Node`, `Mark`, `Extension`, `mergeAttributes`) xuất lại từ `@ecomcx/ecomweb-editor`.
 
 Nâng TipTap: đổi phiên bản trong `package.json` → `npm install` → `node scripts/vendor.mjs` → `npm test` (hợp đồng nội dung phải qua) → commit cả `node_modules/` đã vendor.
 
 ## Dùng
 
 ```tsx
-import { Editor, contentToEditor, editorToContent, enLabels, type MediaProvider } from "@ecomcx/nexus-editor";
-import "@ecomcx/nexus-editor/style.css";   // gồm cả giao diện nền của nội dung (@ecomcx/nexus-content/style.css)
+import { Editor, contentToEditor, editorToContent, enLabels, type MediaProvider } from "@ecomcx/ecomweb-editor";
+import "@ecomcx/ecomweb-editor/style.css";   // gồm cả giao diện nền của nội dung (@ecomcx/ecomweb-content/style.css)
 
 const media: MediaProvider = {
   // Mở hộp chọn media của ứng dụng bạn, trả về file đã chọn
@@ -44,7 +44,7 @@ Không truyền `media` → chèn ảnh/video bằng URL.
 
 ## Bảng, mạng xã hội (1.13)
 
-Ứng dụng dùng Vite và tiền xử lý TipTap lồng trong gói (`optimizeDeps.include: ["@ecomcx/nexus-editor > @tiptap/pm/state", …]`) cần có cả `pm/view` (trình soạn tạo decoration).
+Ứng dụng dùng Vite và tiền xử lý TipTap lồng trong gói (`optimizeDeps.include: ["@ecomcx/ecomweb-editor > @tiptap/pm/state", …]`) cần có cả `pm/view` (trình soạn tạo decoration).
 
 Bảng có `footer` (hàng cuối là chân bảng — `<tfoot>` trên website) và `fixed` (cố định độ rộng cột): nút "Hàng chân bảng" trên thanh công cụ khối, ô tích trong tab Khối. Khối mạng xã hội có `showLabels` (website hiện biểu tượng SVG, bật để kèm tên).
 
@@ -62,7 +62,7 @@ Có sẵn ở mọi trình soạn (`registerBasicBlocks("en")` để đổi nhã
 
 ## Tab Kiểu dáng (1.9)
 
-`<BlockInspector editor={…} device={…} onDeviceChange={…} />` có hai tab **Cài đặt / Kiểu dáng**. Tab Kiểu dáng ghi `attrs.style` (@ecomcx/nexus-content): Kiểu chữ (phông preset, cỡ S/M/L/XL/2XL hoặc tuỳ chỉnh, độ đậm + nghiêng, giãn dòng, giãn cách ký tự, trang trí, viết hoa, căn chữ), Màu (chữ, nền — preset của theme hoặc màu tuỳ chỉnh), Kích thước & khoảng cách (padding/margin một giá trị hoặc 4 cạnh, khoảng cách khối con, rộng, rộng tối đa, cao tối thiểu), Viền & bo góc, Hiển thị (ẩn theo khổ). Chọn khổ màn hình (máy tính / máy tính bảng / điện thoại) → giá trị theo khổ sửa cho khổ đó, khổ chưa đặt hiện giá trị kế thừa. Menu ⋮ mỗi mục bật/tắt điều khiển (nhớ trong trình duyệt) + đặt lại. Giá trị sai báo đỏ, không lưu. Trình soạn hiện kiểu dáng ngay (cùng CSS với website); mọi khối có thuộc tính `style` (`BlockStyleAttr`).
+`<BlockInspector editor={…} device={…} onDeviceChange={…} />` có hai tab **Cài đặt / Kiểu dáng**. Tab Kiểu dáng ghi `attrs.style` (@ecomcx/ecomweb-content): Kiểu chữ (phông preset, cỡ S/M/L/XL/2XL hoặc tuỳ chỉnh, độ đậm + nghiêng, giãn dòng, giãn cách ký tự, trang trí, viết hoa, căn chữ), Màu (chữ, nền — preset của theme hoặc màu tuỳ chỉnh), Kích thước & khoảng cách (padding/margin một giá trị hoặc 4 cạnh, khoảng cách khối con, rộng, rộng tối đa, cao tối thiểu), Viền & bo góc, Hiển thị (ẩn theo khổ). Chọn khổ màn hình (máy tính / máy tính bảng / điện thoại) → giá trị theo khổ sửa cho khổ đó, khổ chưa đặt hiện giá trị kế thừa. Menu ⋮ mỗi mục bật/tắt điều khiển (nhớ trong trình duyệt) + đặt lại. Giá trị sai báo đỏ, không lưu. Trình soạn hiện kiểu dáng ngay (cùng CSS với website); mọi khối có thuộc tính `style` (`BlockStyleAttr`).
 
 ## Thanh công cụ khối (1.8)
 
@@ -75,8 +75,8 @@ Con trỏ trong bộ cột → thanh kéo ở khe giữa hai cột đổi độ 
 ## Khối động (1.7)
 
 ```tsx
-import { registerDynamicBlocks } from "@ecomcx/nexus-editor";
-registerDynamicBlocks("vi");                // một lần; node của khối động (@ecomcx/nexus-content DYNAMIC_NODES) có mặt ở mọi trình soạn
+import { registerDynamicBlocks } from "@ecomcx/ecomweb-editor";
+registerDynamicBlocks("vi");                // một lần; node của khối động (@ecomcx/ecomweb-content DYNAMIC_NODES) có mặt ở mọi trình soạn
 <Editor dynamicBlocks … />                  // chỉ trình soạn này cho chèn (nhóm "Giao diện" trong trình chèn và slash menu)
 ```
 
@@ -88,13 +88,13 @@ Mỗi khối hiện thành khung có tên + dòng tóm tắt (vị trí menu, ph
 .cms-editor, .cms-ed-slash, .cms-ed-bubble { --cms-ed-accent: #e11d48; --cms-ed-panel: #0b0b0d; --cms-ed-fg: #fafafa; }
 ```
 
-Vùng soạn có class `ecx-content` → bảng, danh sách, trích dẫn, khối bố cục dùng chung giao diện nền với website (`@ecomcx/nexus-content/style.css`, `@layer ecx-content`). Ứng dụng có CSS reset trong layer (Tailwind) khai báo `@layer ecx-content;` sau các layer của mình để nền thắng reset.
+Vùng soạn có class `ecx-content` → bảng, danh sách, trích dẫn, khối bố cục dùng chung giao diện nền với website (`@ecomcx/ecomweb-content/style.css`, `@layer ecx-content`). Ứng dụng có CSS reset trong layer (Tailwind) khai báo `@layer ecx-content;` sau các layer của mình để nền thắng reset.
 
 ## Thêm khối (plugin)
 
 ```tsx
 import { Node } from "@tiptap/core";
-import { registerEditorExtension } from "@ecomcx/nexus-editor";
+import { registerEditorExtension } from "@ecomcx/ecomweb-editor";
 import { Star } from "lucide-react";
 
 const Callout = Node.create({ name: "callout", group: "block", content: "inline*", parseHTML: () => [{ tag: "aside" }], renderHTML: () => ["aside", 0] });

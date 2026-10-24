@@ -1,5 +1,5 @@
 import type { Editor as TiptapEditor } from "@tiptap/core";
-import { normalizeContent } from "@ecomcx/nexus-content";
+import { normalizeContent } from "@ecomcx/ecomweb-content";
 
 /**
  * Mẫu (pattern): đoạn nội dung dựng sẵn (giới thiệu, tính năng, bảng giá, kêu gọi hành động…) — chèn = chép khối vào bài,
@@ -13,7 +13,7 @@ export interface Pattern {
   /** Nhóm trong trình chèn: hero, features, cta, pricing, testimonials, faq, team, contact, text, gallery, footer, header… */
   category: string;
   keywords?: string;
-  /** Nội dung: cây khối (`{ type: "doc", content }`), mảng khối, hoặc `{ version, blocks }` của @ecomcx/nexus-content. */
+  /** Nội dung: cây khối (`{ type: "doc", content }`), mảng khối, hoặc `{ version, blocks }` của @ecomcx/ecomweb-content. */
   content: unknown;
   /** Mẫu do người dùng tạo: id của mẫu. */
   ref?: number;
@@ -31,7 +31,7 @@ export function unregisterPattern(name: string) { if (patterns.delete(name)) cha
 export const registeredPatterns = (): Pattern[] => snapshot;
 export function onPatternsChange(l: () => void) { listeners.add(l); return () => { listeners.delete(l); }; }
 
-/** Khối của mẫu (đã chuẩn hoá theo @ecomcx/nexus-content). */
+/** Khối của mẫu (đã chuẩn hoá theo @ecomcx/ecomweb-content). */
 export function patternNodes(p: Pattern): Array<Record<string, unknown>> {
   const raw = Array.isArray(p.content) ? { type: "doc", content: p.content } : p.content;
   const { doc } = normalizeContent(raw);

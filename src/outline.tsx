@@ -2,7 +2,7 @@ import type { Editor as TiptapEditor } from "@tiptap/core";
 import { useEditorState } from "@tiptap/react";
 import { NodeSelection, TextSelection } from "@tiptap/pm/state";
 import type { Node as PMNode } from "@tiptap/pm/model";
-import { embedInfo } from "@ecomcx/nexus-content";
+import { embedInfo } from "@ecomcx/ecomweb-content";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useRef, useState, type DragEvent, type KeyboardEvent } from "react";
 import { blockInfo } from "./blockMeta";

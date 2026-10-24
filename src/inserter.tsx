@@ -8,7 +8,7 @@ import { blockFromPos, currentBlock, insertParagraphAfter } from "./blockops";
 import { viLabels, type EditorLabels } from "./labels";
 import { labelsOf } from "./nodes";
 import type { InsertItem } from "./types";
-import { DYNAMIC_NODES } from "@ecomcx/nexus-content";
+import { DYNAMIC_NODES } from "@ecomcx/ecomweb-content";
 import { rankItems } from "./rank";
 import { DOMSerializer } from "@tiptap/pm/model";
 import { PATTERN_CATEGORIES, insertPattern, onPatternsChange, patternNodes, registeredPatterns, type Pattern } from "./patterns";

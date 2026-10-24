@@ -1,4 +1,4 @@
-import { normalizeContent } from "@ecomcx/nexus-content";
+import { normalizeContent } from "@ecomcx/ecomweb-content";
 import { registeredBlocks } from "./blocks";
 import type { ContentDoc } from "./types";
 

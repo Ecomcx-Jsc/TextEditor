@@ -1,13 +1,13 @@
 {
-  "name": "@ecomcx/nexus-editor",
-  "version": "1.16.1",
+  "name": "@ecomcx/ecomweb-editor",
+  "version": "1.17.0",
   "description": "Trình soạn thảo nội dung dạng khối (TipTap) của CMS — dùng độc lập trong mọi dự án React: ảnh responsive kéo đổi kích thước, gallery, video, bảng, slash menu, mở rộng bằng plugin.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ecomcx-Jsc/ecx-nexus-editor.git"
+    "url": "git+https://github.com/Ecomcx-Jsc/ecomweb-editor.git"
   },
-  "homepage": "https://github.com/Ecomcx-Jsc/ecx-nexus-editor#readme",
+  "homepage": "https://github.com/Ecomcx-Jsc/ecomweb-editor#readme",
   "publishConfig": {
     "access": "public",
     "provenance": true
@@ -31,7 +31,7 @@
     "react-dom": ">=18"
   },
   "dependencies": {
-    "@ecomcx/nexus-content": "^1.13.0",
+    "@ecomcx/ecomweb-content": "^1.14.0",
     "@tiptap/core": "3.32.0",
     "@tiptap/extension-highlight": "3.32.0",
     "@tiptap/extension-image": "3.32.0",

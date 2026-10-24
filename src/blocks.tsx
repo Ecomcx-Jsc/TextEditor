@@ -1,6 +1,6 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 import { NodeViewContent, NodeViewWrapper, ReactNodeViewRenderer, useEditorState, type ReactNodeViewProps } from "@tiptap/react";
-import { BLOCK_VERSION_ATTR, blockDefaults, type BlockAttrSpec, type BlockDefinition } from "@ecomcx/nexus-content";
+import { BLOCK_VERSION_ATTR, blockDefaults, type BlockAttrSpec, type BlockDefinition } from "@ecomcx/ecomweb-content";
 import { Blocks, type LucideIcon } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
 import { registerEditorExtension, unregisterEditorExtension } from "./registry";

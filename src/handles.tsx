@@ -1,7 +1,7 @@
 import { useEditorState, type Editor as TiptapEditor } from "@tiptap/react";
 import { NodeSelection } from "@tiptap/pm/state";
 import type { Node as PMNode } from "@tiptap/pm/model";
-import { normalizeStyle, type Box, type Device } from "@ecomcx/nexus-content";
+import { normalizeStyle, type Box, type Device } from "@ecomcx/ecomweb-content";
 import { useEffect, useState, type PointerEvent as ReactPointerEvent, type ReactElement } from "react";
 import { createPortal } from "react-dom";
 import type { EditorLabels } from "./labels";
