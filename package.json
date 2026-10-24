@@ -1,8 +1,17 @@
 {
   "name": "@ecomcx/nexus-editor",
-  "version": "1.16.0",
+  "version": "1.16.1",
   "description": "Trình soạn thảo nội dung dạng khối (TipTap) của CMS — dùng độc lập trong mọi dự án React: ảnh responsive kéo đổi kích thước, gallery, video, bảng, slash menu, mở rộng bằng plugin.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ecomcx-Jsc/TextEditor.git"
+  },
+  "homepage": "https://github.com/Ecomcx-Jsc/TextEditor#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
