@@ -1,4 +1,4 @@
-import { DYNAMIC_NODES, defineBlock, type BlockAttrSpec, type BlockDefinition } from "@cms/content";
+import { DYNAMIC_NODES, defineBlock, type BlockAttrSpec, type BlockDefinition } from "@ecomcx/nexus-content";
 import {
   AlignLeft, Calendar, Copyright, FileText, Globe, Heading1, Image, Languages, LayoutTemplate, List, ListX, Menu, MessageSquare, MoreHorizontal,
   PanelTop, Repeat, Search, Tags, Text, Type, User, type LucideIcon,

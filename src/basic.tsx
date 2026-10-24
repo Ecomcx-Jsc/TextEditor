@@ -1,5 +1,5 @@
 import { Node } from "@tiptap/core";
-import { colorCss, defineBlock, spacingValue, type BlockAttrSpec } from "@cms/content";
+import { colorCss, defineBlock, spacingValue, type BlockAttrSpec } from "@ecomcx/nexus-content";
 import {
   ChevronRight, Code2, Image as ImageIcon, LayoutPanelLeft, ListTree, MoveVertical, Plus, Quote, RectangleHorizontal, Share2, Trash2, Type, type LucideIcon,
 } from "lucide-react";
@@ -114,7 +114,7 @@ export const Preformatted = Node.create({
 
 let registered: string | null = null;
 
-/** Bộ khối cơ bản (@cms/content 1.9) cho mọi trình soạn — gọi lại với ngôn ngữ khác để đổi nhãn. */
+/** Bộ khối cơ bản (@ecomcx/nexus-content 1.9) cho mọi trình soạn — gọi lại với ngôn ngữ khác để đổi nhãn. */
 export function registerBasicBlocks(locale: "vi" | "en" = "vi") {
   if (registered === locale) return;
   registered = locale;

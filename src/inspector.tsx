@@ -3,7 +3,7 @@ import { useEditorState } from "@tiptap/react";
 import { NodeSelection } from "@tiptap/pm/state";
 import { AlignCenter, AlignJustify, AlignLeft, AlignRight, ArrowDown, ArrowUp, ChevronRight, Copy, Trash2 } from "lucide-react";
 import { Component, useEffect, useId, useState, useSyncExternalStore, type ReactNode } from "react";
-import { CORE_BLOCK_STYLES, normalizeAnchor, normalizeClassName, type Device, type StylePresets } from "@cms/content";
+import { CORE_BLOCK_STYLES, normalizeAnchor, normalizeClassName, type Device, type StylePresets } from "@ecomcx/nexus-content";
 import { StylePanel } from "./stylepanel";
 import { blockPanels, onBlockPanelsChange } from "./panels";
 import { BlockAttributesForm, pluginBlockInfo } from "./blocks";

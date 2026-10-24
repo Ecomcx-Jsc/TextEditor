@@ -1,7 +1,7 @@
-@import "@cms/content/style.css";
+@import "@ecomcx/nexus-content/style.css";
 
 /*
- * @cms/editor — CSS độc lập (không cần Tailwind). Đổi màu bằng biến trên .cms-editor (hoặc thẻ cha):
+ * @ecomcx/nexus-editor — CSS độc lập (không cần Tailwind). Đổi màu bằng biến trên .cms-editor (hoặc thẻ cha):
  *   --cms-ed-bg, --cms-ed-panel, --cms-ed-fg, --cms-ed-muted, --cms-ed-faint, --cms-ed-line, --cms-ed-hover,
  *   --cms-ed-accent, --cms-ed-accent-soft, --cms-ed-accent-fg, --cms-ed-danger, --cms-ed-code-bg, --cms-ed-font
  */
@@ -42,7 +42,7 @@
 .cms-ed-slash-hint { display: block; font-size: 11px; color: var(--cms-ed-faint); }
 .cms-ed-slash-empty { padding: 12px 8px; text-align: center; font-size: 12px; color: var(--cms-ed-muted); }
 
-/* Nội dung — giao diện nền dùng chung với website (@cms/content/style.css, class ecx-content); ở đây chỉ phần riêng của trình soạn */
+/* Nội dung — giao diện nền dùng chung với website (@ecomcx/nexus-content/style.css, class ecx-content); ở đây chỉ phần riêng của trình soạn */
 .cms-ed-content { min-height: 50vh; padding: 16px 0 96px; outline: none; font-size: 15px; line-height: 1.75;
   --ecx-border: var(--cms-ed-line); --ecx-muted: var(--cms-ed-muted); --ecx-accent: var(--cms-ed-accent); --ecx-surface: var(--cms-ed-hover); --ecx-code-bg: var(--cms-ed-code-bg); }
 .cms-ed-content > * + * { margin-top: .85em; }

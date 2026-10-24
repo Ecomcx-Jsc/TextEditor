@@ -1,10 +1,10 @@
 import { Extension, type Editor as TiptapEditor } from "@tiptap/core";
-import { collectStyles, normalizeAnchor, normalizeBlockStyleName, normalizeClassName, normalizeStyle, presetCss, styleClass, type BlockStyle, type StylePresets } from "@cms/content";
+import { collectStyles, normalizeAnchor, normalizeBlockStyleName, normalizeClassName, normalizeStyle, presetCss, styleClass, type BlockStyle, type StylePresets } from "@ecomcx/nexus-content";
 
 const SKIP = new Set(["doc", "text", "hardBreak", "tableRow"]);
 
 /**
- * Kiểu dáng khối (`attrs.style`, @cms/content) cho mọi loại khối của trình soạn: lưu trong JSON, hiện bằng class `ecx-s-…`
+ * Kiểu dáng khối (`attrs.style`, @ecomcx/nexus-content) cho mọi loại khối của trình soạn: lưu trong JSON, hiện bằng class `ecx-s-…`
  * (cùng CSS với website), sao chép/dán giữ nguyên qua `data-ecx-style`. Khối mới tách ra (Enter) không kế thừa.
  */
 export const BlockStyleAttr = Extension.create({

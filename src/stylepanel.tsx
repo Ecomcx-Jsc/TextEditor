@@ -1,4 +1,4 @@
-import { normalizeStyle, type BlockStyle, type Device, type StylePresets } from "@cms/content";
+import { normalizeStyle, type BlockStyle, type Device, type StylePresets } from "@ecomcx/nexus-content";
 import { Link2, Link2Off, Monitor, MoreVertical, Smartphone, Tablet } from "lucide-react";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import type { EditorLabels } from "./labels";
@@ -140,7 +140,7 @@ function Panel({ title, section, t, visible, setVisible, onReset, children }: {
 }
 
 /**
- * Tab "Kiểu dáng" của khối: kiểu chữ, màu, khoảng cách, viền, ẩn theo khổ màn hình — ghi vào `attrs.style` (@cms/content).
+ * Tab "Kiểu dáng" của khối: kiểu chữ, màu, khoảng cách, viền, ẩn theo khổ màn hình — ghi vào `attrs.style` (@ecomcx/nexus-content).
  * Giá trị theo khổ (khoảng cách, cỡ chữ…) sửa theo khổ đang chọn; khổ nhỏ chưa đặt thì kế thừa khổ lớn hơn.
  */
 export function StylePanel({ style: raw, onChange, t, device, onDeviceChange, presets, variants, variant, onVariantChange }: {

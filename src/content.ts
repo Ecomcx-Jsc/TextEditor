@@ -1,4 +1,4 @@
-import { normalizeContent } from "@cms/content";
+import { normalizeContent } from "@ecomcx/nexus-content";
 import { registeredBlocks } from "./blocks";
 import type { ContentDoc } from "./types";
 

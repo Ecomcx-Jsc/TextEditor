@@ -17,7 +17,7 @@ import { layoutExtensions } from "./layout";
 import { BlockStyleAttr } from "./styleattr";
 
 /**
- * Mọi khối + định dạng lõi mà trình soạn hiểu — khớp với định dạng nội dung của CMS (@cms/content CORE_NODES/CORE_MARKS):
+ * Mọi khối + định dạng lõi mà trình soạn hiểu — khớp với định dạng nội dung của CMS (@ecomcx/nexus-content CORE_NODES/CORE_MARKS):
  * mọi thứ website vẽ được thì trình soạn mở và lưu lại được. Dùng chung cho Editor và test hợp đồng.
  */
 export function coreExtensions(): AnyExtension[] {

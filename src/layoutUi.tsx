@@ -2,7 +2,7 @@ import type { Editor as TiptapEditor } from "@tiptap/core";
 import { useEditorState } from "@tiptap/react";
 import { NodeSelection, TextSelection, type EditorState } from "@tiptap/pm/state";
 import type { Node as PMNode } from "@tiptap/pm/model";
-import { embedInfo } from "@cms/content";
+import { embedInfo } from "@ecomcx/nexus-content";
 import { AlignCenter, AlignLeft, AlignRight, Columns2, Columns3, Globe, Info, Pencil, RectangleHorizontal, SquareDashed } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";

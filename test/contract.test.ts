@@ -4,16 +4,16 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { test } from "node:test";
 import { getSchema } from "@tiptap/core";
-import { defineBlock, normalizeContent } from "@cms/content";
+import { defineBlock, normalizeContent } from "@ecomcx/nexus-content";
 import { coreExtensions, knownTypes } from "../src/extensions";
 import { unwrapUnknown, wrapUnknown } from "../src/unknown";
 import { contentToEditor, editorToContent } from "../src/content";
 import { blockNode, registerBlock, registeredBlocks, unregisterBlock } from "../src/blocks";
 import { registeredExtensions } from "../src/registry";
 
-// Hợp đồng phía trình soạn: mở mỗi bài mẫu của @cms/content trong trình soạn rồi lưu lại → nội dung giữ nguyên
+// Hợp đồng phía trình soạn: mở mỗi bài mẫu của @ecomcx/nexus-content trong trình soạn rồi lưu lại → nội dung giữ nguyên
 // (sai khác duy nhất được chấp nhận: trình soạn ghi thêm thuộc tính bằng đúng giá trị mặc định — cùng ý nghĩa).
-const fixturesDir = path.join(path.dirname(createRequire(import.meta.url).resolve("@cms/content/package.json")), "fixtures");
+const fixturesDir = path.join(path.dirname(createRequire(import.meta.url).resolve("@ecomcx/nexus-content/package.json")), "fixtures");
 const fixtures = readdirSync(fixturesDir).filter((f) => f.endsWith(".json")).map((f) => JSON.parse(readFileSync(path.join(fixturesDir, f), "utf8")));
 
 import { registerBasicBlocks } from "../src/basic";
