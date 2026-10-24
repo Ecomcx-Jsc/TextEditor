@@ -15,6 +15,10 @@ export interface Pattern {
   keywords?: string;
   /** Nội dung: cây khối (`{ type: "doc", content }`), mảng khối, hoặc `{ version, blocks }` của @cms/content. */
   content: unknown;
+  /** Mẫu do người dùng tạo: id của mẫu. */
+  ref?: number;
+  /** Mẫu đồng bộ: chèn thành tham chiếu (`syncedPattern { ref }`) thay vì chép khối. */
+  synced?: boolean;
 }
 
 const patterns = new Map<string, Pattern>();
@@ -37,7 +41,7 @@ export function patternNodes(p: Pattern): Array<Record<string, unknown>> {
 
 /** Chèn mẫu dưới khối đang chọn (dòng trống đang có con trỏ → thay dòng đó). */
 export function insertPattern(editor: TiptapEditor, p: Pattern) {
-  const nodes = patternNodes(p);
+  const nodes = p.synced && p.ref ? [{ type: "syncedPattern", attrs: { ref: p.ref } }] : patternNodes(p);
   if (!nodes.length) return false;
   const { $from, empty } = editor.state.selection;
   if (empty && $from.depth > 0 && $from.parent.type.name === "paragraph" && $from.parent.content.size === 0)

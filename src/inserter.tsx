@@ -88,7 +88,7 @@ function PatternList({ editor, t, query }: { editor: TiptapEditor; t: EditorLabe
   const all = useSyncExternalStore(onPatternsChange, registeredPatterns);
   const q = norm(query.trim());
   const list = q ? all.filter((p) => norm(`${p.title} ${p.description ?? ""} ${p.keywords ?? ""} ${p.category}`).includes(q)) : all;
-  const cats = [...new Set([...PATTERN_CATEGORIES, ...list.map((p) => p.category)])].filter((c) => list.some((p) => p.category === c));
+  const cats = [...new Set(["mine", ...PATTERN_CATEGORIES, ...list.map((p) => p.category)])].filter((c) => list.some((p) => p.category === c));
   if (!list.length) return <p className="cms-ed-inspector-empty">{t.noPatterns}</p>;
   return <>
     {cats.map((c) => (
@@ -98,7 +98,7 @@ function PatternList({ editor, t, query }: { editor: TiptapEditor; t: EditorLabe
           {list.filter((p) => p.category === c).map((p) => (
             <button key={p.name} type="button" className="cms-ed-pattern" data-pattern={p.name} title={p.description} onClick={() => insertPattern(editor, p)}>
               <PatternPreview editor={editor} pattern={p} />
-              <span className="cms-ed-pattern-title">{p.title}</span>
+              <span className="cms-ed-pattern-title">{p.title}{p.synced && <span className="cms-ed-pattern-synced">{t.syncedBadge}</span>}</span>
             </button>
           ))}
         </div>

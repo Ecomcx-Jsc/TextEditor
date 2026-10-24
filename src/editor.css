@@ -333,3 +333,13 @@
 /* Bảng: chân bảng, cố định độ rộng cột */
 .cms-ed-content :is(table[data-footer], [data-footer] table) tr:last-child > td { font-weight: 600; background: var(--cms-ed-hover); }
 .cms-ed-content :is(table[data-fixed], [data-fixed] table) { table-layout: fixed; }
+
+/* Mẫu đồng bộ: khung tím nhạt, thanh tên + "Sửa mẫu gốc" / "Tách ra", nội dung chỉ xem */
+.cms-ed-pattern-synced { margin-left: 6px; padding: 0 5px; border-radius: 4px; font-size: 10px; font-weight: 600; background: color-mix(in srgb, #7c3aed 14%, transparent); color: #7c3aed; }
+.cms-ed-synced { position: relative; margin: 8px 0; border: 1px dashed color-mix(in srgb, #7c3aed 55%, transparent); border-radius: 6px; }
+.cms-ed-synced.is-selected { outline: 2px solid #7c3aed; outline-offset: 2px; }
+.cms-ed-synced-bar { display: flex; align-items: center; gap: 6px; padding: 4px 8px; font-size: 12px; color: #7c3aed; border-bottom: 1px dashed color-mix(in srgb, #7c3aed 35%, transparent); user-select: none; }
+.cms-ed-synced-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.cms-ed-synced-bar button { display: inline-flex; align-items: center; gap: 4px; padding: 2px 6px; border: 0; border-radius: 4px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.cms-ed-synced-bar button:hover, .cms-ed-synced-bar button:focus-visible { background: color-mix(in srgb, #7c3aed 12%, transparent); }
+.cms-ed-synced-preview { padding: 8px 12px; pointer-events: none; }

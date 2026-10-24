@@ -21,6 +21,7 @@ import { cx } from "./util";
 import { rankItems } from "./rank";
 export { rankItems } from "./rank";
 import { AskPopover, askOf, createAskStore, type Ask } from "./ask";
+import type { PatternHost } from "./synced";
 import { BlockHandle, BlockKeys } from "./handle";
 import { BlockSettingsBar, layoutItems } from "./layoutUi";
 import { BlockToolbar } from "./toolbar";
@@ -59,6 +60,8 @@ export interface EditorProps {
   dynamicBlocks?: boolean;
   /** Preset kiểu dáng của theme (màu, cỡ chữ, khoảng cách, phông) — vùng soạn dùng cùng biến CSS với website. */
   presets?: StylePresets;
+  /** Mẫu của ứng dụng: nội dung mẫu đồng bộ, "Tạo mẫu" từ khối đang chọn, mở mẫu gốc. */
+  patterns?: PatternHost;
 }
 
 // ---------------------------------------------------------------------------
@@ -309,7 +312,7 @@ function Stats({ editor, t }: { editor: TiptapEditor; t: EditorLabels }) {
 /** Trình soạn nội dung. Dùng kèm CSS: import "@cms/editor/style.css". */
 const NO_PACKS: EditorExtensionPack[] = [];
 
-export function Editor({ initial, onChange, media, labels, extensions: localPacks = NO_PACKS, toolbarClassName, className, onReady, ariaLabel, dynamicBlocks = false, presets }: EditorProps) {
+export function Editor({ initial, onChange, media, labels, extensions: localPacks = NO_PACKS, toolbarClassName, className, onReady, ariaLabel, dynamicBlocks = false, presets, patterns }: EditorProps) {
   const t = useMemo(() => ({ ...viLabels, ...labels }), [labels]);
   const slash = useMemo(createSlashStore, []);
   const globalPacks = useSyncExternalStore(onExtensionsChange, registeredExtensions);
@@ -394,6 +397,8 @@ export function Editor({ initial, onChange, media, labels, extensions: localPack
     });
     onReady?.(editor);
   }, [editor, t]);
+  // Nguồn mẫu của ứng dụng (mẫu đồng bộ, "Tạo mẫu") cho node view và menu khối
+  useEffect(() => { if (editor) (editor.storage as any).cmsEditorContext.patterns = patterns; }, [editor, patterns]);
   // Lệnh chèn (gồm khối plugin) cho trình chèn ở ngoài trình soạn (BlockInserter); giao dịch rỗng để nó đọc lại
   useEffect(() => {
     if (!editor || editor.isDestroyed) return;

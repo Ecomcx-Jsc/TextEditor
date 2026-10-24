@@ -1,8 +1,9 @@
 import { Extension, type Editor as TiptapEditor } from "@tiptap/core";
 import { NodeSelection } from "@tiptap/pm/state";
-import { ArrowDown, ArrowUp, Copy, CornerLeftUp, GripVertical, Plus, Trash2, type LucideIcon } from "lucide-react";
+import { ArrowDown, ArrowUp, Copy, CornerLeftUp, GripVertical, Plus, Shapes, Trash2, type LucideIcon } from "lucide-react";
 import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent } from "react";
 import { createPortal } from "react-dom";
+import { createPatternFrom, patternHostOf } from "./synced";
 import { blockFromPos, currentBlock, deleteBlock, duplicateBlock, insertParagraphAfter, insertParagraphBefore, moveBlock, parentBlock, type BlockRef } from "./blockops";
 import type { EditorLabels } from "./labels";
 import { cx } from "./util";
@@ -11,10 +12,11 @@ const mac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator
 const key = (s: string) => (mac ? s.replace("Mod", "⌘").replace("Shift", "⇧").replace("Alt", "⌥").replace(/-/g, "") : s.replace("Mod", "Ctrl").replace(/-/g, "+"));
 
 /** Thao tác khối theo phím tắt (cùng chỗ với menu khối). */
-export type BlockAction = "up" | "down" | "duplicate" | "delete" | "parent" | "insert" | "insertBefore";
+export type BlockAction = "up" | "down" | "duplicate" | "delete" | "parent" | "insert" | "insertBefore" | "pattern";
 
 export function runBlockAction(editor: TiptapEditor, action: BlockAction, block = currentBlock(editor.state)): boolean {
   if (!block) return false;
+  if (action === "pattern") { void createPatternFrom(editor, block); return true; }
   const { state } = editor;
   const tr = action === "up" ? moveBlock(state, block, -1) : action === "down" ? moveBlock(state, block, 1)
     : action === "duplicate" ? duplicateBlock(state, block) : action === "delete" ? deleteBlock(state, block)
@@ -139,6 +141,7 @@ export function BlockHandle({ editor, t, menuRequest }: { editor: TiptapEditor; 
     ["down", ArrowDown, t.moveDown, key("Mod-Shift-↓"), index < count - 1],
     ["duplicate", Copy, t.duplicate, key("Mod-Shift-D"), true],
     ...(hasParent ? [["parent", CornerLeftUp, t.selectParent, null, true] as [BlockAction, LucideIcon, string, string | null, boolean]] : []),
+    ...(patternHostOf(editor)?.create ? [["pattern", Shapes, t.createPattern, null, true] as [BlockAction, LucideIcon, string, string | null, boolean]] : []),
     ["delete", Trash2, t.deleteBlock, key("Mod-Shift-⌫"), true],
   ];
 

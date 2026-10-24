@@ -11,6 +11,7 @@ import Superscript from "@tiptap/extension-superscript";
 import Highlight from "@tiptap/extension-highlight";
 import { Color, TextStyle } from "@tiptap/extension-text-style";
 import { AudioNode, CmsImage, EditorContext, FileNode, Gallery, VideoNode } from "./nodes";
+import { SyncedPattern } from "./synced";
 import { UnknownBlock, UnknownInline, UnknownMark } from "./unknown";
 import { layoutExtensions } from "./layout";
 import { BlockStyleAttr } from "./styleattr";
@@ -23,7 +24,7 @@ export function coreExtensions(): AnyExtension[] {
   return [
     // Link: không tự gắn rel="nofollow"/tab mới cho mọi liên kết (mặc định của TipTap) — website/plugin SEO quyết định theo tên miền
     StarterKit.configure({ heading: { levels: [2, 3, 4] }, link: { openOnClick: false, autolink: true, HTMLAttributes: { target: null, rel: null } } }),
-    CmsImage, Gallery, VideoNode, AudioNode, FileNode, EditorContext,
+    CmsImage, Gallery, VideoNode, AudioNode, FileNode, EditorContext, SyncedPattern,
     TextAlign.configure({ types: ["heading", "paragraph"] }),
     Youtube.configure({ nocookie: true }),
     TableKit.configure({ table: false }),
