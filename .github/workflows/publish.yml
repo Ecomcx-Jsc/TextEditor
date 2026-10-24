@@ -1,6 +1,6 @@
 # Publish @ecomcx/nexus-editor to npm when a version tag is pushed (v1.2.3 = version in package.json).
 # Trusted Publishing (OIDC): no npm token - on npmjs.com: package > Settings > Trusted Publisher > GitHub Actions,
-# repository Ecomcx-Jsc/TextEditor, workflow publish.yml.
+# repository Ecomcx-Jsc/ecx-nexus-editor, workflow publish.yml.
 name: Publish npm
 
 on:

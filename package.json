@@ -5,9 +5,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Ecomcx-Jsc/TextEditor.git"
+    "url": "git+https://github.com/Ecomcx-Jsc/ecx-nexus-editor.git"
   },
-  "homepage": "https://github.com/Ecomcx-Jsc/TextEditor#readme",
+  "homepage": "https://github.com/Ecomcx-Jsc/ecx-nexus-editor#readme",
   "publishConfig": {
     "access": "public",
     "provenance": true
